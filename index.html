@@ -802,18 +802,22 @@ const cases = [
 
 // ── NAV ────────────────────────────────────────────────────────────────────
 function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  (btn || event.currentTarget).classList.add('active');
-  if (name === 'home') renderHome();
-  if (name === 'schedule') renderSchedule();
-  if (name === 'exams') renderExams();
-  if (name === 'notes') renderNoteList();
-  if (name === 'quiz') renderQuizSetup();
-  if (name === 'upload') renderUploadPage();
-  if (name === 'cases') renderCases();
-  if (name === 'settings') renderSettings();
+  try {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    const page = document.getElementById('page-' + name);
+    if (!page) return;
+    page.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'home') renderHome();
+    if (name === 'schedule') renderSchedule();
+    if (name === 'exams') renderExams();
+    if (name === 'notes') renderNoteList();
+    if (name === 'quiz') renderQuizSetup();
+    if (name === 'upload') renderUploadPage();
+    if (name === 'cases') renderCases();
+    if (name === 'settings') renderSettings();
+  } catch(e) { console.error('showPage error:', e); }
 }
 
 // ── HOME ───────────────────────────────────────────────────────────────────
@@ -2073,24 +2077,34 @@ function importData(input) {
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-// Clean up any malformed custom categories (e.g. empty names or button text saved as categories)
-(function cleanupCategories() {
-  const custom = S.get('pa_custom_categories') || {};
-  let changed = false;
-  Object.keys(custom).forEach(k => {
-    const v = custom[k];
-    if (!v || typeof v !== 'string' || v.trim() === '' || v.includes('Add note') || v.includes('onclick') || v.includes('<')) {
-      delete custom[k];
-      changed = true;
-    }
-  });
-  if (changed) S.set('pa_custom_categories', custom);
-})();
-document.getElementById('newExamDate').min = new Date().toISOString().split('T')[0];
-document.getElementById('newTaskDate').value = todayStr();
-schedDayOffset = new Date().getDay();
-loadSavedTheme();
-renderHome();
+try {
+  // Clean up any malformed custom categories
+  (function cleanupCategories() {
+    try {
+      const custom = S.get('pa_custom_categories') || {};
+      let changed = false;
+      Object.keys(custom).forEach(k => {
+        const v = custom[k];
+        if (!v || typeof v !== 'string' || v.trim() === '' ||
+            v.includes('Add note') || v.includes('onclick') || v.includes('<')) {
+          delete custom[k];
+          changed = true;
+        }
+      });
+      if (changed) S.set('pa_custom_categories', custom);
+    } catch(e) { console.warn('Category cleanup error:', e); }
+  })();
+
+  document.getElementById('newExamDate').min = new Date().toISOString().split('T')[0];
+  document.getElementById('newTaskDate').value = todayStr();
+  schedDayOffset = new Date().getDay();
+  loadSavedTheme();
+  renderHome();
+} catch(e) {
+  console.error('Init error:', e);
+  // Attempt a minimal render so the app at least shows
+  try { renderHome(); } catch(e2) {}
+}
 </script>
 </body>
 </html>
