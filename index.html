@@ -440,11 +440,15 @@
 <!-- NOTES -->
 <div id="page-notes" class="page">
   <div id="notesListView">
-    <div class="page-title">Notes</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="page-title" style="margin-bottom:0;">Notes</div>
+      <button class="btn btn-sm btn-accent" onclick="openAddCategoryModal()">+ Category</button>
+    </div>
     <div class="note-tabs" id="noteTabs"></div>
     <div id="noteListItems"></div>
-    <div style="margin-top:12px;">
+    <div style="margin-top:12px;display:flex;gap:8px;">
       <button class="btn btn-pro btn-block btn-sm" onclick="sendToAI('Generate a concise quick-reference note for PA didactic year on the current subject I am studying')">✦ Generate note with AI</button>
+      <button class="btn btn-sm" onclick="openAddNoteModal()" style="white-space:nowrap;">+ Add note</button>
     </div>
   </div>
   <div id="noteDetailView" style="display:none;">
@@ -600,9 +604,9 @@
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     Home
   </button>
-  <button class="nav-item" onclick="showPage('schedule',this)">
-    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/></svg>
-    Schedule
+  <button class="nav-item" onclick="showPage('exams',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Exams
   </button>
   <button class="nav-item" onclick="showPage('notes',this)">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -652,6 +656,41 @@
     </div>
     <div class="form-group"><label class="form-label">Date</label><input type="date" id="newExamDate" /></div>
     <button class="btn btn-accent btn-block" onclick="addExam()">Add exam</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="addCategoryModal" onclick="closeModalBackdrop(event,'addCategoryModal')">
+  <div class="modal">
+    <div class="modal-title">Add category 🗂️ <button class="modal-close" onclick="closeModal('addCategoryModal')">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Category name</label>
+      <input type="text" id="newCategoryName" placeholder="e.g. Physiology, Microbiology, HEENT..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji (optional)</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="categoryEmojiPicker"></div>
+      <input type="text" id="newCategoryEmoji" placeholder="Or type any emoji..." style="font-size:18px;" maxlength="4" />
+    </div>
+    <button class="btn btn-accent btn-block" onclick="addCategory()">Add category</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="addNoteModal" onclick="closeModalBackdrop(event,'addNoteModal')">
+  <div class="modal">
+    <div class="modal-title">Add note ✏️ <button class="modal-close" onclick="closeModal('addNoteModal')">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" id="newNoteTitle" placeholder="e.g. Heart sounds, Cranial nerves..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select id="newNoteCategory"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <textarea id="newNoteContent" placeholder="Write your note here..." style="min-height:120px;resize:vertical;line-height:1.6;"></textarea>
+    </div>
+    <button class="btn btn-accent btn-block" onclick="addManualNote()">Save note</button>
   </div>
 </div>
 
@@ -969,7 +1008,85 @@ function deleteExam(id) {
 
 // ── NOTES ──────────────────────────────────────────────────────────────────
 let activeSubject = 'pharm';
-const subjectLabels = {pharm:'Pharmacology',clin:'Clinical',anat:'Anatomy',path:'Pathology'};
+
+// Load custom categories from storage, merged with defaults
+const defaultSubjectLabels = {pharm:'Pharmacology',clin:'Clinical',anat:'Anatomy',path:'Pathology'};
+function getSubjectLabels() {
+  const custom = S.get('pa_custom_categories') || {};
+  return {...defaultSubjectLabels, ...custom};
+}
+// subjectLabels is a live getter so it always reflects saved categories
+let subjectLabels = getSubjectLabels();
+
+function addCategory() {
+  const name = document.getElementById('newCategoryName').value.trim();
+  if (!name) return;
+  const emoji = document.getElementById('newCategoryEmoji').value.trim();
+  // Create a key from the name
+  const key = name.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20) + '_' + Date.now();
+  const label = (emoji ? emoji + ' ' : '') + name;
+  const custom = S.get('pa_custom_categories') || {};
+  custom[key] = label;
+  S.set('pa_custom_categories', custom);
+  subjectLabels = getSubjectLabels();
+  activeSubject = key;
+  document.getElementById('newCategoryName').value = '';
+  document.getElementById('newCategoryEmoji').value = '';
+  closeModal('addCategoryModal');
+  renderNoteList();
+}
+
+function deleteCategory(key) {
+  if (!confirm(`Delete category "${subjectLabels[key]}" and all its notes?`)) return;
+  const custom = S.get('pa_custom_categories') || {};
+  delete custom[key];
+  S.set('pa_custom_categories', custom);
+  delete state.notes[key];
+  subjectLabels = getSubjectLabels();
+  activeSubject = 'pharm';
+  save();
+  renderNoteList();
+}
+
+function addManualNote() {
+  const title = document.getElementById('newNoteTitle').value.trim();
+  const content = document.getElementById('newNoteContent').value.trim();
+  const category = document.getElementById('newNoteCategory').value;
+  if (!title || !content) { alert('Please fill in both a title and content.'); return; }
+  if (!state.notes[category]) state.notes[category] = [];
+  state.notes[category].unshift({
+    id: 'manual_' + Date.now(),
+    title,
+    content: content.replace(/\n/g, '<br>'),
+    aiGen: false
+  });
+  activeSubject = category;
+  document.getElementById('newNoteTitle').value = '';
+  document.getElementById('newNoteContent').value = '';
+  save();
+  closeModal('addNoteModal');
+  renderNoteList();
+}
+
+function openAddNoteModal() {
+  // Populate category dropdown with all current subjects
+  const sel = document.getElementById('newNoteCategory');
+  sel.innerHTML = Object.entries(subjectLabels)
+    .filter(([k]) => k !== 'review')
+    .map(([k,v]) => `<option value="${k}" ${k===activeSubject?'selected':''}>${v}</option>`)
+    .join('');
+  openModal('addNoteModal');
+}
+
+function openAddCategoryModal() {
+  // Populate emoji picker
+  const emojis = ['📚','🔬','🧬','💊','🩺','🫀','🫁','🦷','👁️','🧠','🦴','💉','🩻','📋','🧪','⚕️'];
+  const picker = document.getElementById('categoryEmojiPicker');
+  if (picker) picker.innerHTML = emojis.map(e =>
+    `<button onclick="document.getElementById('newCategoryEmoji').value='${e}';this.style.background='var(--accent-bg)'" style="background:var(--surface-1);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:18px;cursor:pointer;">${e}</button>`
+  ).join('');
+  openModal('addCategoryModal');
+}
 
 function getHiddenNotes() {
   try { return JSON.parse(localStorage.getItem('pa_hidden_notes') || '[]'); } catch { return []; }
@@ -991,22 +1108,28 @@ function getAllNotes(subj) {
 function renderNoteList() {
   document.getElementById('notesListView').style.display = 'block';
   document.getElementById('noteDetailView').style.display = 'none';
-  if ((state.notes['review'] || []).length && !subjectLabels['review']) subjectLabels['review'] = '⭐ Review';
+  subjectLabels = getSubjectLabels();
+  if ((state.notes['review'] || []).length) subjectLabels['review'] = '⭐ Review';
   const tabs = document.getElementById('noteTabs');
-  tabs.innerHTML = Object.keys(subjectLabels).map(k =>
-    `<div class="note-tab ${k===activeSubject?'active':''}" onclick="setNoteSubject('${k}')">${subjectLabels[k]}</div>`
-  ).join('');
+  const customKeys = Object.keys(S.get('pa_custom_categories') || {});
+  tabs.innerHTML = Object.entries(subjectLabels).map(([k,v]) => {
+    const isCustom = customKeys.includes(k);
+    return `<div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
+      <div class="note-tab ${k===activeSubject?'active':''}" onclick="setNoteSubject('${k}')" style="padding-right:${isCustom?'28px':'14px'};">${v}</div>
+      ${isCustom ? `<button onclick="event.stopPropagation();deleteCategory('${k}')" style="position:absolute;right:6px;background:none;border:none;font-size:14px;cursor:pointer;color:${k===activeSubject?'white':'var(--text-muted)'};padding:0;line-height:1;">×</button>` : ''}
+    </div>`;
+  }).join('');
   const el = document.getElementById('noteListItems');
   const notes = getAllNotes(activeSubject);
   const builtIds = (builtInNotes[activeSubject] || []).map(n => n.id);
   el.innerHTML = notes.map((n,i) => {
     const isBuiltIn = builtIds.includes(n.id);
     return `<div class="note-list-item" onclick="showNoteDetail(${i})">
-      <div class="note-title-sm">${n.title}${n.aiGen?'':isBuiltIn?'':''}</div>
+      <div class="note-title-sm">${n.title}</div>
       <button onclick="event.stopPropagation();${isBuiltIn?`hideBuiltInNote('${n.id}')`:`deleteNote('${activeSubject}','${n.id}')`}" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;line-height:1;">×</button>
       <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--text-muted);fill:none;stroke-width:2;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`;
-  }).join('') || '<div class="empty">No notes yet 🌸<br><span style="font-size:12px;margin-top:4px;display:block;">Add one with the AI button below</span></div>';
+  }).join('') || `<div class="empty">No notes yet 🌸<br><span style="font-size:12px;margin-top:4px;display:block;">Use "+ Add note" to write one, or "✦ Generate" for AI help</span></div>`;
 }
 
 function setNoteSubject(s) { activeSubject = s; renderNoteList(); }
