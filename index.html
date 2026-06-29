@@ -548,9 +548,9 @@
     <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
       <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">Import data</div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Load a backup file exported from another device. This will merge with your current data — nothing gets deleted.</div>
-      <label class="btn btn-block" style="cursor:pointer;justify-content:center;position:relative;">
+      <label class="btn btn-block" style="cursor:pointer;justify-content:center;">
         ⬆️ Choose backup file to import
-        <input type="file" accept=".json" onchange="importData(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+        <input type="file" accept=".json" onchange="importData(this)" style="display:none;">
       </label>
       <div id="importStatus" style="font-size:12px;text-align:center;margin-top:8px;display:none;"></div>
     </div>
