@@ -581,10 +581,13 @@
   <div class="section-label">Page title decoration</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="emojiPicker"></div>
 
-  <div class="section-label">Default notes</div>
+  <div class="section-label">Default notes & categories</div>
   <div class="card" style="margin-bottom:10px;">
-    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:10px;">Deleted a built-in note by accident? Restore them all here.</div>
-    <button class="btn btn-block" onclick="localStorage.removeItem('pa_hidden_notes');renderNoteList();alert('Built-in notes restored! 🌸')">Restore default notes</button>
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:10px;">Restore hidden tabs or deleted built-in notes.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn btn-block" onclick="S.set('pa_hidden_categories',[]);renderNoteList();alert('Category tabs restored! 🌸')">Restore hidden category tabs</button>
+      <button class="btn btn-block" onclick="localStorage.removeItem('pa_hidden_notes');renderNoteList();alert('Built-in notes restored! 🌸')">Restore deleted built-in notes</button>
+    </div>
   </div>
 
   <div class="section-label">Gemini API key</div>
@@ -675,7 +678,13 @@
   </div>
 </div>
 
-<div class="modal-backdrop" id="addNoteModal" onclick="closeModalBackdrop(event,'addNoteModal')">
+<div class="modal-backdrop" id="moveNoteModal" onclick="closeModalBackdrop(event,'moveNoteModal')">
+  <div class="modal">
+    <div class="modal-title">Move note 📂 <button class="modal-close" onclick="closeModal('moveNoteModal')">✕</button></div>
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:12px;">Select a category to move this note to:</div>
+    <div id="moveCategoryList" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
   <div class="modal">
     <div class="modal-title">Add note ✏️ <button class="modal-close" onclick="closeModal('addNoteModal')">✕</button></div>
     <div class="form-group">
@@ -1036,14 +1045,23 @@ function addCategory() {
   renderNoteList();
 }
 
+function hideCategoryTab(key) {
+  if (!confirm(`Hide the "${subjectLabels[key]}" tab? Your notes stay saved — restore it anytime in Settings.`)) return;
+  const hidden = S.get('pa_hidden_categories') || [];
+  if (!hidden.includes(key)) hidden.push(key);
+  S.set('pa_hidden_categories', hidden);
+  if (activeSubject === key) activeSubject = 'pharm';
+  renderNoteList();
+}
+
 function deleteCategory(key) {
-  if (!confirm(`Delete category "${subjectLabels[key]}" and all its notes?`)) return;
+  if (!confirm(`Delete category "${subjectLabels[key]}" and all its notes? This cannot be undone.`)) return;
   const custom = S.get('pa_custom_categories') || {};
   delete custom[key];
   S.set('pa_custom_categories', custom);
   delete state.notes[key];
   subjectLabels = getSubjectLabels();
-  activeSubject = 'pharm';
+  if (activeSubject === key) activeSubject = 'pharm';
   save();
   renderNoteList();
 }
@@ -1112,13 +1130,20 @@ function renderNoteList() {
   if ((state.notes['review'] || []).length) subjectLabels['review'] = '⭐ Review';
   const tabs = document.getElementById('noteTabs');
   const customKeys = Object.keys(S.get('pa_custom_categories') || {});
-  tabs.innerHTML = Object.entries(subjectLabels).map(([k,v]) => {
-    const isCustom = customKeys.includes(k);
-    return `<div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
-      <div class="note-tab ${k===activeSubject?'active':''}" onclick="setNoteSubject('${k}')" style="padding-right:${isCustom?'28px':'14px'};">${v}</div>
-      ${isCustom ? `<button onclick="event.stopPropagation();deleteCategory('${k}')" style="position:absolute;right:6px;background:none;border:none;font-size:14px;cursor:pointer;color:${k===activeSubject?'white':'var(--text-muted)'};padding:0;line-height:1;">×</button>` : ''}
-    </div>`;
-  }).join('');
+  const defaultKeys = Object.keys(defaultSubjectLabels);
+  const hiddenCats = S.get('pa_hidden_categories') || [];
+  tabs.innerHTML = Object.entries(subjectLabels)
+    .filter(([k]) => !hiddenCats.includes(k))
+    .map(([k,v]) => {
+      const isCustom = customKeys.includes(k);
+      const isActive = k === activeSubject;
+      return `<div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
+        <div class="note-tab ${isActive?'active':''}" onclick="setNoteSubject('${k}')" style="padding-right:26px;">${v}</div>
+        <button onclick="event.stopPropagation();${isCustom?`deleteCategory('${k}')`:`hideCategoryTab('${k}')`}"
+          title="${isCustom?'Delete category':'Hide tab'}"
+          style="position:absolute;right:5px;background:none;border:none;font-size:15px;cursor:pointer;color:${isActive?'rgba(255,255,255,0.7)':'var(--text-muted)'};padding:0;line-height:1;">×</button>
+      </div>`;
+    }).join('');
   const el = document.getElementById('noteListItems');
   const notes = getAllNotes(activeSubject);
   const builtIds = (builtInNotes[activeSubject] || []).map(n => n.id);
@@ -1150,9 +1175,12 @@ function showNoteDetail(i) {
   document.getElementById('notesListView').style.display = 'none';
   document.getElementById('noteDetailView').style.display = 'block';
   document.getElementById('noteDetailContent').innerHTML =
-    `<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px;">
-      <h3 style="font-size:17px;font-weight:800;">${n.title}</h3>
-      <button onclick="${deleteAction}" style="background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Delete</button>
+    `<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap;">
+      <h3 style="font-size:17px;font-weight:800;flex:1;">${n.title}</h3>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button onclick="openMoveNoteModal('${n.id}','${activeSubject}')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Move</button>
+        <button onclick="${deleteAction}" style="background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Delete</button>
+      </div>
     </div>
     ${n.content}
     <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
@@ -1170,6 +1198,54 @@ function showNoteDetail(i) {
 }
 
 function showNoteList() { renderNoteList(); }
+
+function openMoveNoteModal(noteId, fromSubj) {
+  subjectLabels = getSubjectLabels();
+  const hiddenCats = S.get('pa_hidden_categories') || [];
+  const list = document.getElementById('moveCategoryList');
+  list.innerHTML = Object.entries(subjectLabels)
+    .filter(([k]) => k !== fromSubj && k !== 'review' && !hiddenCats.includes(k))
+    .map(([k,v]) => `
+      <button onclick="moveNote('${noteId}','${fromSubj}','${k}')"
+        class="btn btn-block"
+        style="justify-content:flex-start;gap:10px;padding:12px 14px;">
+        <span style="font-size:15px;">${v.match(/^\p{Emoji}/u)?.[0] || '📁'}</span>
+        <span style="font-size:14px;font-weight:700;">${v}</span>
+      </button>`).join('');
+  openModal('moveNoteModal');
+}
+
+function moveNote(noteId, fromSubj, toSubj) {
+  // Find the note — check custom notes first, then built-in
+  let note = null;
+  const customNotes = state.notes[fromSubj] || [];
+  const customIdx = customNotes.findIndex(n => n.id === noteId);
+
+  if (customIdx !== -1) {
+    // It's a custom/AI note — move it
+    note = customNotes[customIdx];
+    state.notes[fromSubj].splice(customIdx, 1);
+    if (!state.notes[toSubj]) state.notes[toSubj] = [];
+    state.notes[toSubj].unshift({...note});
+    save();
+  } else {
+    // It's a built-in note — hide it from source, copy to destination
+    const builtNote = (builtInNotes[fromSubj] || []).find(n => n.id === noteId);
+    if (builtNote) {
+      hideBuiltInNote(noteId);
+      if (!state.notes[toSubj]) state.notes[toSubj] = [];
+      state.notes[toSubj].unshift({
+        ...builtNote,
+        id: 'moved_' + Date.now(),
+        aiGen: false
+      });
+      save();
+    }
+  }
+  activeSubject = toSubj;
+  closeModal('moveNoteModal');
+  renderNoteList();
+}
 
 async function startNoteQuiz(noteId, subj, noteIdx) {
   const n = getAllNotes(subj)[noteIdx];
