@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PA Study">
+<meta name="theme-color" content="#ff85a1">
+<link rel="manifest" href="manifest.json">
+<title>PA Study 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Sanrio palette — cherry blossom pink as the signature */
+    --accent: #e8557a;
+    --accent-bg: #fff0f4;
+    --accent-border: #f9c0ce;
+    --success: #7dbf8e;
+    --success-bg: #f0faf2;
+    --success-border: #b8e6c1;
+    --warning: #e8a23a;
+    --warning-bg: #fff8ee;
+    --warning-border: #fad9a0;
+    --danger: #e8557a;
+    --danger-bg: #fff0f4;
+    --danger-border: #f9c0ce;
+    --pro: #c084d4;
+    --pro-bg: #fdf4ff;
+    --pro-border: #e8c5f2;
+    --surface-0: #fff5f8;
+    --surface-1: #ffeef3;
+    --surface-2: #ffffff;
+    --border: #fad4e0;
+    --border-strong: #f0a8be;
+    --text-primary: #4a2030;
+    --text-secondary: #8a5568;
+    --text-muted: #c0899a;
+    --radius: 16px;
+    --nav-h: 64px;
+    --kitty-pink: #ff85a1;
+    --kitty-red: #e8557a;
+    --kitty-yellow: #ffd166;
+    --kitty-mint: #a8e6cf;
+    --kitty-lavender: #d4b8e0;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--surface-0);
+    background-image:
+      radial-gradient(circle at 15% 10%, #ffccd9 0%, transparent 35%),
+      radial-gradient(circle at 85% 90%, #f7d4f0 0%, transparent 35%);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── CUTE DECORATIVE ELEMENTS ── */
+  .page-title::after {
+    content: ' 🎀';
+    font-size: 18px;
+  }
+
+  /* ── NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-h);
+    background: white;
+    border-top: 2px solid var(--border);
+    display: flex; z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -4px 20px rgba(232, 85, 122, 0.1);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; cursor: pointer;
+    color: var(--text-muted); border: none; background: none;
+    padding: 8px 4px; font-size: 10px; font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    transition: color .2s, transform .2s;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active svg { transform: scale(1.15); }
+  .nav-item:active { transform: scale(0.93); }
+  .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+
+  /* ── LAYOUT ── */
+  .page { display: none; padding: 0 16px; padding-top: 24px; padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px); max-width: 680px; margin: 0 auto; }
+  .page.active { display: block; }
+  .page-title { font-size: 24px; font-weight: 800; color: var(--text-primary); margin-bottom: 18px; letter-spacing: -0.3px; }
+  .section-label {
+    font-size: 11px; font-weight: 800; color: var(--kitty-pink);
+    text-transform: uppercase; letter-spacing: .08em;
+    margin-bottom: 8px; margin-top: 20px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* ── CARDS ── */
+  .card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 14px 16px; margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(232, 85, 122, 0.07);
+  }
+  .card-sm {
+    background: white; border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 10px 12px; margin-bottom: 6px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1.5px solid var(--border-strong);
+    background: white; color: var(--text-primary);
+    border-radius: 50px; padding: 9px 18px; font-size: 14px;
+    font-weight: 700; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-accent {
+    background: linear-gradient(135deg, #ff85a1, #e8557a);
+    color: white; border-color: #e8557a;
+    box-shadow: 0 4px 14px rgba(232, 85, 122, 0.35);
+  }
+  .btn-accent:active { opacity: .9; box-shadow: none; }
+  .btn-pro {
+    background: linear-gradient(135deg, #e8c5f2, #d4b8e0);
+    color: #7a3d9e; border-color: var(--pro-border);
+  }
+  .btn-block { width: 100%; justify-content: center; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+  /* ── INPUTS ── */
+  input[type=text], input[type=date], select, textarea {
+    width: 100%; background: var(--surface-1);
+    border: 1.5px solid var(--border); border-radius: 14px;
+    color: var(--text-primary); font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 500; padding: 10px 14px; outline: none;
+    -webkit-appearance: none; appearance: none;
+    transition: border-color .15s;
+  }
+  input[type=text]:focus, input[type=date]:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,85,122,0.12); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c0899a' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+
+  /* ── TAGS ── */
+  .tag { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 50px; }
+  .tag-pharm { background: var(--pro-bg); color: var(--pro); border: 1px solid var(--pro-border); }
+  .tag-clin { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
+  .tag-anat { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+  .tag-path { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+
+  /* ── STAT ROW ── */
+  .stat-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card {
+    background: white; border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 14px 16px;
+    box-shadow: 0 2px 12px rgba(232,85,122,0.07);
+  }
+  .stat-n { font-size: 26px; font-weight: 800; }
+  .stat-l { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 600; }
+
+  /* ── EXAM CARDS ── */
+  .exam-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+  .exam-scroll::-webkit-scrollbar { display: none; }
+  .exam-chip {
+    flex-shrink: 0; background: white; border: 1.5px solid var(--border);
+    border-radius: 18px; padding: 12px 14px; width: 155px;
+    box-shadow: 0 2px 10px rgba(232,85,122,0.07);
+  }
+  .exam-chip.urgent { border-color: var(--danger-border); background: var(--danger-bg); }
+  .exam-chip.soon { border-color: var(--warning-border); background: var(--warning-bg); }
+  .exam-chip.ok { border-color: var(--success-border); background: var(--success-bg); }
+  .exam-days { font-size: 28px; font-weight: 800; }
+  .exam-chip.urgent .exam-days { color: var(--danger); }
+  .exam-chip.soon .exam-days { color: var(--warning); }
+  .exam-chip.ok .exam-days { color: var(--success); }
+  .exam-name { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+  .exam-date { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+  /* ── TASKS ── */
+  .task-row {
+    display: flex; align-items: center; gap: 10px;
+    background: white; border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 11px 14px; margin-bottom: 8px;
+    box-shadow: 0 1px 8px rgba(232,85,122,0.05);
+  }
+  .chk {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border-strong); border-radius: 50%;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .chk:active { transform: scale(0.85); }
+  .chk.done { background: linear-gradient(135deg, #ff85a1, #e8557a); border-color: #e8557a; }
+  .task-txt { flex: 1; font-size: 14px; font-weight: 600; }
+  .task-txt.done { text-decoration: line-through; color: var(--text-muted); }
+
+  /* ── NOTES ── */
+  .note-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; padding-bottom: 2px; }
+  .note-tabs::-webkit-scrollbar { display: none; }
+  .note-tab {
+    flex-shrink: 0; background: white; border: 1.5px solid var(--border);
+    border-radius: 50px; padding: 6px 16px; font-size: 13px;
+    font-weight: 700; color: var(--text-secondary); cursor: pointer; white-space: nowrap;
+    font-family: 'Nunito', sans-serif;
+  }
+  .note-tab.active {
+    background: linear-gradient(135deg, #ff85a1, #e8557a);
+    border-color: #e8557a; color: white;
+    box-shadow: 0 3px 10px rgba(232,85,122,0.3);
+  }
+  .note-list-item {
+    display: flex; align-items: center; gap: 10px;
+    background: white; border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .note-list-item:active { transform: scale(0.98); }
+  .note-title-sm { font-size: 14px; font-weight: 700; flex: 1; }
+  .note-detail { background: white; border: 1.5px solid var(--border); border-radius: 20px; padding: 18px; }
+  .note-detail h4 {
+    font-size: 11px; font-weight: 800; color: var(--kitty-pink);
+    text-transform: uppercase; letter-spacing: .06em; margin: 14px 0 6px;
+  }
+  .note-detail h4:first-child { margin-top: 0; }
+  .note-detail p { font-size: 14px; line-height: 1.7; color: var(--text-primary); margin-bottom: 6px; font-weight: 500; }
+  .note-detail ul { padding-left: 18px; }
+  .note-detail li { font-size: 14px; line-height: 1.7; margin-bottom: 3px; font-weight: 500; }
+  .note-detail table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 6px; }
+  .note-detail th {
+    text-align: left; padding: 7px 8px; font-size: 10px; font-weight: 800;
+    color: var(--kitty-pink); text-transform: uppercase; letter-spacing: .04em;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .note-detail td { padding: 8px 8px; border-bottom: 1px solid var(--border); font-weight: 500; }
+  .back-row { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; cursor: pointer; color: var(--accent); font-size: 14px; font-weight: 800; }
+
+  /* ── QUIZ ── */
+  .q-prog { height: 8px; background: var(--surface-1); border-radius: 50px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); }
+  .q-prog-fill { height: 100%; background: linear-gradient(90deg, #ff85a1, #e8557a); border-radius: 50px; transition: width .4s cubic-bezier(.34,1.56,.64,1); }
+  .q-stem { font-size: 16px; font-weight: 700; line-height: 1.6; margin-bottom: 16px; color: var(--text-primary); }
+  .q-choice {
+    width: 100%; text-align: left; background: white;
+    border: 1.5px solid var(--border); border-radius: 14px;
+    padding: 13px 14px; font-size: 14px; cursor: pointer; margin-bottom: 8px;
+    font-family: 'Nunito', sans-serif; font-weight: 600; color: var(--text-primary);
+    transition: border-color .15s, transform .1s;
+  }
+  .q-choice:active { transform: scale(0.98); }
+  .q-choice.correct { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+  .q-choice.wrong { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
+  .q-explain {
+    background: var(--accent-bg); border-left: 3px solid var(--accent);
+    padding: 10px 14px; font-size: 13px; color: var(--text-secondary);
+    line-height: 1.6; border-radius: 0 14px 14px 0; margin-bottom: 14px; font-weight: 600;
+  }
+  .score-big { font-size: 72px; font-weight: 800; color: var(--accent); text-align: center; }
+  .score-row { display: flex; justify-content: center; gap: 32px; margin: 16px 0 24px; }
+  .score-item { text-align: center; }
+  .score-n { font-size: 30px; font-weight: 800; }
+  .score-l { font-size: 12px; color: var(--text-muted); font-weight: 700; }
+
+  /* ── UPLOAD ── */
+  .drop-zone {
+    border: 2px dashed var(--border-strong); border-radius: 20px;
+    padding: 32px 16px; text-align: center; cursor: pointer; position: relative;
+    transition: border-color .15s, background .15s; margin-bottom: 12px;
+    background: white;
+  }
+  .drop-zone.drag { border-color: var(--accent); background: var(--accent-bg); }
+  .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-icon { font-size: 40px; margin-bottom: 8px; }
+  .spinner { width: 18px; height: 18px; border: 2px solid var(--pro-border); border-top-color: var(--pro); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .processing-bar { display: none; align-items: center; gap: 10px; background: var(--pro-bg); border-radius: 14px; padding: 10px 14px; font-size: 13px; color: var(--pro); margin-bottom: 10px; font-weight: 700; border: 1px solid var(--pro-border); }
+
+  /* ── TIMELINE ── */
+  .tl { padding-left: 18px; border-left: 2px solid var(--border); }
+  .tl-item { position: relative; padding: 0 0 18px 18px; }
+  .tl-dot { position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border-strong); background: white; }
+  .tl-dot.urgent { background: var(--danger); border-color: var(--danger); }
+  .tl-dot.soon { background: var(--warning); border-color: var(--warning); }
+  .tl-dot.ok { background: var(--success); border-color: var(--success); }
+  .tl-date { font-size: 11px; color: var(--text-muted); font-weight: 700; }
+  .tl-name { font-size: 14px; font-weight: 700; }
+  .tl-sub { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+
+  /* ── CASE ── */
+  .vital-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0; }
+  .vital { background: var(--surface-1); border-radius: 14px; padding: 10px 12px; border: 1px solid var(--border); }
+  .vital-val { font-size: 20px; font-weight: 800; }
+  .vital-val.abn { color: var(--danger); }
+  .vital-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 700; }
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .action-btn {
+    background: var(--surface-1); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 11px 12px; font-size: 13px; cursor: pointer;
+    color: var(--text-primary); font-family: 'Nunito', sans-serif; font-weight: 700; text-align: left;
+    transition: transform .1s;
+  }
+  .action-btn:active { transform: scale(0.97); }
+
+  /* ── FORM ROWS ── */
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 12px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+  .input-row { display: flex; gap: 8px; }
+  .input-row > * { flex: 1; }
+
+  /* ── DIFF BADGE ── */
+  .diff { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 50px; }
+  .diff-easy { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+  .diff-med { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+  .diff-hard { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+
+  /* ── API KEY ── */
+  .api-setup { background: var(--pro-bg); border: 1.5px solid var(--pro-border); border-radius: 20px; padding: 16px; margin-bottom: 16px; }
+  .api-setup p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; font-weight: 600; }
+  .api-setup a { color: var(--pro); font-weight: 700; }
+
+  /* ── WEEK STRIP ── */
+  .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 16px; }
+  .week-day { background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 8px 4px; text-align: center; }
+  .week-day.today { border-color: var(--accent); background: var(--accent-bg); box-shadow: 0 2px 8px rgba(232,85,122,0.2); }
+  .week-day-lbl { font-size: 9px; color: var(--text-muted); font-weight: 800; }
+  .week-day-num { font-size: 13px; font-weight: 800; color: var(--text-primary); }
+  .week-day.today .week-day-num { color: var(--accent); }
+
+  /* ── MODAL ── */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(74,32,48,.35); z-index: 200; align-items: flex-end; }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: white; border-radius: 28px 28px 0 0;
+    padding: 20px 16px; padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    width: 100%; max-height: 85vh; overflow-y: auto;
+    border-top: 2px solid var(--border);
+    box-shadow: 0 -8px 30px rgba(232,85,122,0.15);
+  }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary); }
+  .modal-close {
+    float: right; background: var(--surface-1); border: 1.5px solid var(--border);
+    border-radius: 50%; width: 30px; height: 30px; cursor: pointer;
+    color: var(--text-muted); font-size: 15px;
+    display: flex; align-items: center; justify-content: center; font-weight: 800;
+  }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; font-weight: 700; }
+  .empty svg { width: 40px; height: 40px; stroke: var(--border-strong); fill: none; stroke-width: 1.5; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+
+  /* ── KITTY HEADER BANNER ── */
+  .kitty-banner {
+    background: linear-gradient(135deg, #ffccd9 0%, #ffd6e7 50%, #f7d4f0 100%);
+    border-radius: 20px; padding: 14px 18px;
+    margin-bottom: 18px; border: 1.5px solid #f9c0ce;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 3px 14px rgba(232,85,122,0.13);
+  }
+  .kitty-face {
+    font-size: 36px; line-height: 1; flex-shrink: 0;
+  }
+  .kitty-greet { font-size: 15px; font-weight: 800; color: #c0394f; }
+  .kitty-sub { font-size: 12px; color: #c06070; font-weight: 600; margin-top: 2px; }
+
+  /* ── STAR DECORATIONS ── */
+  .star-deco { color: var(--kitty-yellow); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- ── PAGES ── -->
+
+<!-- HOME / SCHEDULE -->
+<div id="page-home" class="page active">
+  <div class="kitty-banner">
+    <div class="kitty-face">🎀</div>
+    <div>
+      <div class="kitty-greet">Hello, future PA! ★</div>
+      <div class="kitty-sub" id="kittyDate"></div>
+    </div>
+  </div>
+
+  <!-- Upcoming exam banner -->
+  <div id="nextExamBanner" style="display:none;" class="card" style="margin-bottom:16px;"></div>
+
+  <div class="stat-row" id="homeStats"></div>
+
+  <div class="section-label">Upcoming exams</div>
+  <div class="exam-scroll" id="examScroll"></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div class="section-label" style="margin-top:0;">Today's tasks</div>
+    <button class="btn btn-sm btn-accent" onclick="openModal('addTaskModal')" style="margin-bottom:8px;">+ Add</button>
+  </div>
+  <div id="taskList"></div>
+</div>
+
+<!-- WEEKLY SCHEDULE PAGE -->
+<div id="page-schedule" class="page">
+  <div class="page-title">Schedule</div>
+
+  <!-- Week nav -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <button class="btn btn-sm" onclick="shiftWeek(-1)">← Prev</button>
+    <span id="weekRangeLabel" style="font-size:13px;font-weight:800;color:var(--text-secondary);"></span>
+    <button class="btn btn-sm" onclick="shiftWeek(1)">Next →</button>
+  </div>
+
+  <!-- Day tabs -->
+  <div class="note-tabs" id="schedDayTabs"></div>
+
+  <!-- Selected day tasks -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <div id="schedDayLabel" style="font-size:14px;font-weight:800;color:var(--text-primary);"></div>
+    <button class="btn btn-sm btn-accent" onclick="openAddTaskForSchedDay()">+ Add task</button>
+  </div>
+  <div id="schedTaskList"></div>
+
+  <!-- Week overview dots -->
+  <div class="section-label" style="margin-top:20px;">Week overview</div>
+  <div id="weekOverview"></div>
+</div>
+
+<!-- EXAMS -->
+<div id="page-exams" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div class="page-title" style="margin-bottom:0;">Exams</div>
+    <button class="btn btn-accent btn-sm" onclick="openModal('addExamModal')">+ Add exam</button>
+  </div>
+  <div class="section-label">Coming up</div>
+  <div id="examCardGrid"></div>
+  <div class="section-label">Timeline</div>
+  <div class="tl" id="examTimeline"></div>
+</div>
+
+<!-- NOTES -->
+<div id="page-notes" class="page">
+  <div id="notesListView">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="page-title" style="margin-bottom:0;">Notes</div>
+      <button class="btn btn-sm btn-accent" onclick="openAddCategoryModal()">+ Category</button>
+    </div>
+    <div class="note-tabs" id="noteTabs"></div>
+    <div id="noteListItems"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn btn-pro btn-block btn-sm" onclick="sendToAI('Generate a concise quick-reference note for PA didactic year on the current subject I am studying')">✦ Generate note with AI</button>
+      <button class="btn btn-sm" onclick="openAddNoteModal()" style="white-space:nowrap;">+ Add note</button>
+    </div>
+  </div>
+  <div id="noteDetailView" style="display:none;">
+    <div class="back-row" onclick="showNoteList()">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;"><polyline points="15 18 9 12 15 6"/></svg>
+      Notes
+    </div>
+    <div class="note-detail" id="noteDetailContent"></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="page-quiz" class="page">
+  <div id="quizSetupView">
+    <div class="page-title">Quiz</div>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Questions</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="range" min="5" max="20" value="10" id="qCount" step="1" oninput="document.getElementById('qCountOut').textContent=this.value" style="flex:1;">
+          <span id="qCountOut" style="font-size:14px;font-weight:600;min-width:24px;">10</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Source</label>
+        <select id="quizSource">
+          <option value="all">All subjects</option>
+          <option value="pharm">Pharmacology</option>
+          <option value="clin">Clinical medicine</option>
+          <option value="anat">Anatomy</option>
+          <option value="path">Pathology</option>
+          <option value="uploaded">Uploaded material only</option>
+        </select>
+      </div>
+      <button class="btn btn-accent btn-block" onclick="startQuiz()">Start quiz</button>
+    </div>
+    <div class="section-label">Question bank</div>
+    <div id="qBankStats" class="card-sm" style="font-size:13px;color:var(--text-secondary);"></div>
+  </div>
+  <div id="quizActiveView" style="display:none;"></div>
+</div>
+
+<!-- UPLOAD -->
+<div id="page-upload" class="page">
+  <div class="page-title">Upload</div>
+
+  <div id="apiSetup" class="api-setup">
+    <strong style="font-size:14px;color:var(--pro);">🌸 Free Google Gemini key required</strong>
+    <p>To extract notes and generate quiz questions from your files, enter your free Google Gemini API key. It's stored only on your device and never costs anything.</p>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="apiKeyInput" placeholder="Paste your Gemini API key here..." style="flex:1;font-size:13px;" />
+      <button class="btn btn-pro btn-sm" onclick="saveApiKey()">Save</button>
+    </div>
+    <p style="margin-top:8px;margin-bottom:0;font-size:12px;">Get your free key in 2 min at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> → click "Create API key"</p>
+  </div>
+
+  <div class="drop-zone" id="dropZone" ondragover="handleDrag(event,true)" ondragleave="handleDrag(event,false)" ondrop="handleDrop(event)">
+    <input type="file" id="fileInput" multiple accept=".pdf,.txt,.md,.pptx,.ppt,.docx" onchange="handleFiles(this.files)" />
+    <div class="drop-icon">📂</div>
+    <div style="font-size:15px;font-weight:500;margin-bottom:4px;">Drop files here</div>
+    <div style="font-size:13px;color:var(--text-muted);">PDFs work best · PowerPoint: export as PDF first</div>
+  </div>
+
+  <div id="processingBar" class="processing-bar">
+    <div class="spinner"></div>
+    <span id="processingMsg">Analyzing...</span>
+  </div>
+
+  <div id="uploadResults"></div>
+
+  <div class="section-label">Uploaded files</div>
+  <div id="uploadedFileList"><div class="empty">No files yet</div></div>
+</div>
+
+<!-- CASES -->
+<div id="page-cases" class="page">
+  <div id="caseListView">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="page-title" style="margin-bottom:0;">Cases</div>
+      <button class="btn btn-pro btn-sm" onclick="sendToAI('Generate a new patient case for PA didactic year: include chief complaint, brief HPI, vitals, and 3 discussion questions')">✦ Generate</button>
+    </div>
+    <div id="caseCards"></div>
+  </div>
+  <div id="caseSimView" style="display:none;"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page">
+  <div class="page-title">Settings</div>
+
+  <div class="section-label">Choose a theme</div>
+  <div id="themeGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"></div>
+
+  <div class="section-label">Custom accent color</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:12px;">Pick any color to make the app yours 🎨</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <input type="color" id="customAccent" value="#e8557a" style="width:52px;height:52px;border:none;border-radius:12px;cursor:pointer;padding:0;background:none;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Accent color</div>
+        <div style="font-size:12px;color:var(--text-muted);">Buttons, highlights, active tabs</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <input type="color" id="customBg" value="#fff5f8" style="width:52px;height:52px;border:none;border-radius:12px;cursor:pointer;padding:0;background:none;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">Background color</div>
+        <div style="font-size:12px;color:var(--text-muted);">App background tint</div>
+      </div>
+    </div>
+    <button class="btn btn-accent btn-block" onclick="applyCustomTheme()">Apply custom theme</button>
+  </div>
+
+  <div class="section-label">Corner style</div>
+  <div style="display:flex;gap:8px;margin-bottom:20px;">
+    <button class="btn" id="radiusCute" onclick="setRadius('cute')" style="flex:1;flex-direction:column;gap:4px;padding:12px 8px;">
+      <span style="font-size:20px;">🔵</span>
+      <span style="font-size:12px;">Bubbly</span>
+    </button>
+    <button class="btn" id="radiusMed" onclick="setRadius('med')" style="flex:1;flex-direction:column;gap:4px;padding:12px 8px;">
+      <span style="font-size:20px;">🟦</span>
+      <span style="font-size:12px;">Rounded</span>
+    </button>
+    <button class="btn" id="radiusSharp" onclick="setRadius('sharp')" style="flex:1;flex-direction:column;gap:4px;padding:12px 8px;">
+      <span style="font-size:20px;">⬛</span>
+      <span style="font-size:12px;">Sharp</span>
+    </button>
+  </div>
+
+  <div class="section-label">Page title decoration</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="emojiPicker"></div>
+
+  <div class="section-label">Default notes & categories</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:10px;">Restore hidden tabs or deleted built-in notes.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn btn-block" onclick="S.set('pa_hidden_categories',[]);renderNoteList();alert('Category tabs restored! 🌸')">Restore hidden category tabs</button>
+      <button class="btn btn-block" onclick="localStorage.removeItem('pa_hidden_notes');renderNoteList();alert('Built-in notes restored! 🌸')">Restore deleted built-in notes</button>
+    </div>
+  </div>
+
+  <div class="section-label">Gemini API key</div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:10px;">Update your free Google Gemini key</div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="settingsApiKey" placeholder="Paste new key here..." style="flex:1;font-size:13px;" />
+      <button class="btn btn-pro btn-sm" onclick="saveApiKeyFromSettings()">Save</button>
+    </div>
+    <div id="currentKeyStatus" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- ── BOTTOM NAV ── -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home',this)">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Home
+  </button>
+  <button class="nav-item" onclick="showPage('exams',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Exams
+  </button>
+  <button class="nav-item" onclick="showPage('notes',this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Notes
+  </button>
+  <button class="nav-item" onclick="showPage('quiz',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Quiz
+  </button>
+  <button class="nav-item" onclick="showPage('upload',this)">
+    <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+    Upload
+  </button>
+  <button class="nav-item" onclick="showPage('settings',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- ── MODALS ── -->
+<div class="modal-backdrop" id="addTaskModal" onclick="closeModalBackdrop(event,'addTaskModal')">
+  <div class="modal">
+    <div class="modal-title">Add task 🎀 <button class="modal-close" onclick="closeModal('addTaskModal')">✕</button></div>
+    <div class="form-group"><label class="form-label">Task</label><input type="text" id="newTaskText" placeholder="e.g. Review beta-blocker indications" /></div>
+    <div class="form-group"><label class="form-label">Subject</label>
+      <select id="newTaskTag">
+        <option value="clin">Clinical medicine</option>
+        <option value="pharm">Pharmacology</option>
+        <option value="anat">Anatomy</option>
+        <option value="path">Pathology</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" id="newTaskDate" /></div>
+    <button class="btn btn-accent btn-block" onclick="addTask()">Add task</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="addExamModal" onclick="closeModalBackdrop(event,'addExamModal')">
+  <div class="modal">
+    <div class="modal-title">Add exam <button class="modal-close" onclick="closeModal('addExamModal')">✕</button></div>
+    <div class="form-group"><label class="form-label">Exam name</label><input type="text" id="newExamName" placeholder="Block 2 Pharmacology Final" /></div>
+    <div class="form-group"><label class="form-label">Subject</label>
+      <select id="newExamSubj">
+        <option>Clinical medicine</option><option>Pharmacology</option><option>Anatomy</option>
+        <option>Pathology</option><option>Physiology</option><option>Microbiology</option><option>OSCE</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Date</label><input type="date" id="newExamDate" /></div>
+    <button class="btn btn-accent btn-block" onclick="addExam()">Add exam</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="addCategoryModal" onclick="closeModalBackdrop(event,'addCategoryModal')">
+  <div class="modal">
+    <div class="modal-title">Add category 🗂️ <button class="modal-close" onclick="closeModal('addCategoryModal')">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Category name</label>
+      <input type="text" id="newCategoryName" placeholder="e.g. Physiology, Microbiology, HEENT..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji (optional)</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="categoryEmojiPicker"></div>
+      <input type="text" id="newCategoryEmoji" placeholder="Or type any emoji..." style="font-size:18px;" maxlength="4" />
+    </div>
+    <button class="btn btn-accent btn-block" onclick="addCategory()">Add category</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="moveNoteModal" onclick="closeModalBackdrop(event,'moveNoteModal')">
+  <div class="modal">
+    <div class="modal-title">Move note 📂 <button class="modal-close" onclick="closeModal('moveNoteModal')">✕</button></div>
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:12px;">Select a category to move this note to:</div>
+    <div id="moveCategoryList" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+  <div class="modal">
+    <div class="modal-title">Add note ✏️ <button class="modal-close" onclick="closeModal('addNoteModal')">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" id="newNoteTitle" placeholder="e.g. Heart sounds, Cranial nerves..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select id="newNoteCategory"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <textarea id="newNoteContent" placeholder="Write your note here..." style="min-height:120px;resize:vertical;line-height:1.6;"></textarea>
+    </div>
+    <button class="btn btn-accent btn-block" onclick="addManualNote()">Save note</button>
+  </div>
+</div>
+
+<script>
+// ── STORAGE ────────────────────────────────────────────────────────────────
+const S = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+};
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let state = {
+  exams: S.get('pa_exams') || [
+    {id:'demo1',name:'Block 1 Final',subj:'Clinical medicine',date:'2026-07-18'},
+    {id:'demo2',name:'Pharmacology Midterm',subj:'Pharmacology',date:'2026-07-11'},
+    {id:'demo3',name:'Anatomy Practical',subj:'Anatomy',date:'2026-08-05'},
+  ],
+  tasks: S.get('pa_tasks') || [
+    {id:1,text:'Review cardiology HPI frameworks',tag:'clin',done:false,date:todayStr()},
+    {id:2,text:'Memorize beta-blocker indications',tag:'pharm',done:false,date:todayStr()},
+    {id:3,text:'Brachial plexus roots',tag:'anat',done:false,date:todayStr()},
+  ],
+  uploadedFiles: S.get('pa_files') || [],
+  generatedQs: S.get('pa_gen_qs') || [],
+  notes: S.get('pa_notes') || {},
+  streak: S.get('pa_streak') || 12,
+};
+
+function save() {
+  S.set('pa_exams', state.exams);
+  S.set('pa_tasks', state.tasks);
+  S.set('pa_files', state.uploadedFiles);
+  S.set('pa_gen_qs', state.generatedQs);
+  S.set('pa_notes', state.notes);
+}
+
+// ── BUILT-IN DATA ──────────────────────────────────────────────────────────
+const builtInNotes = {
+  pharm: [
+    {id:'p1',title:'Beta-blockers',content:`<h4>Mechanism</h4><p>Block β-adrenergic receptors → ↓ HR, ↓ contractility, ↓ AV conduction.</p><h4>Key drugs</h4><table><tr><th>Drug</th><th>Selectivity</th><th>Use</th></tr><tr><td>Metoprolol succinate</td><td>β1</td><td>HF, HTN, post-MI</td></tr><tr><td>Carvedilol</td><td>α1+β</td><td>HF, HTN</td></tr><tr><td>Propranolol</td><td>Non-selective</td><td>Tremor, migraine Px</td></tr></table><h4>Contraindications</h4><ul><li>Decompensated HF</li><li>Bradycardia / heart block</li><li>Reactive airway disease (non-selective)</li></ul>`},
+    {id:'p2',title:'ACE inhibitors',content:`<h4>Mechanism</h4><p>Block ACE → ↓ angiotensin II, ↑ bradykinin → vasodilation + natriuresis.</p><h4>Side effects</h4><ul><li>Dry cough (bradykinin ↑) — class effect</li><li>Hyperkalemia</li><li>Angioedema (rare but serious)</li><li>Teratogenic — avoid in pregnancy</li></ul><h4>Use in CKD</h4><p>Preferred antihypertensive — reduces intraglomerular pressure via efferent dilation, slowing CKD progression.</p>`},
+    {id:'p3',title:'Statins',content:`<h4>Mechanism</h4><p>HMG-CoA reductase inhibitors → ↓ hepatic cholesterol → ↑ LDL receptors → ↓ LDL.</p><h4>High-intensity</h4><ul><li>Rosuvastatin 20–40 mg</li><li>Atorvastatin 40–80 mg</li></ul><h4>Watch for</h4><p>Myalgia → check CK. Rhabdomyolysis risk ↑ with fibrates and CYP3A4 inhibitors.</p>`},
+  ],
+  clin: [
+    {id:'c1',title:'Chest pain DDx',content:`<h4>Rule out first</h4><ul><li>ACS — crushing, radiates to arm/jaw, diaphoresis</li><li>PE — pleuritic, dyspnea, risk factors</li><li>Aortic dissection — tearing, back pain, BP differential</li><li>Tension pneumothorax — absent breath sounds, tracheal deviation</li></ul><h4>Workup</h4><p>ECG within 10 min, troponin 0h/3h, CXR. HEART score for risk stratification.</p>`},
+    {id:'c2',title:'HTN management',content:`<h4>Stages (ACC/AHA 2017)</h4><table><tr><th>Stage</th><th>SBP</th><th>DBP</th></tr><tr><td>Normal</td><td>&lt;120</td><td>&lt;80</td></tr><tr><td>Elevated</td><td>120–129</td><td>&lt;80</td></tr><tr><td>Stage 1</td><td>130–139</td><td>80–89</td></tr><tr><td>Stage 2</td><td>≥140</td><td>≥90</td></tr></table><h4>First-line agents</h4><ul><li>Thiazide diuretic</li><li>CCB (amlodipine)</li><li>ACE inhibitor or ARB</li></ul>`},
+  ],
+  anat: [
+    {id:'a1',title:'Brachial plexus',content:`<h4>Roots</h4><p>C5–T1. Mnemonic: "Randy Travis Drinks Cold Beer" → Roots, Trunks, Divisions, Cords, Branches.</p><h4>Injuries</h4><table><tr><th>Injury</th><th>Roots</th><th>Finding</th></tr><tr><td>Erb's palsy</td><td>C5–C6</td><td>Waiter's tip — adducted, extended, pronated</td></tr><tr><td>Klumpke's</td><td>C8–T1</td><td>Intrinsic hand loss, Horner's</td></tr></table>`},
+    {id:'a2',title:'Heart borders on CXR',content:`<ul><li><strong>Right border:</strong> RA + SVC</li><li><strong>Left border (top→bottom):</strong> aortic knob, PA, LA appendage, LV</li><li><strong>Boot-shaped:</strong> Tetralogy of Fallot</li><li><strong>Egg on a string:</strong> TGA</li></ul>`},
+  ],
+  path: [
+    {id:'pt1',title:'Pneumonia pathogens',content:`<table><tr><th>Organism</th><th>Clue</th></tr><tr><td>S. pneumoniae</td><td>Rusty sputum, lobar, most common</td></tr><tr><td>Mycoplasma</td><td>Walking pneumonia, cold agglutinins</td></tr><tr><td>Legionella</td><td>Water source, hyponatremia</td></tr><tr><td>Klebsiella</td><td>Alcoholic, currant jelly sputum</td></tr></table>`},
+    {id:'pt2',title:'DVT & PE',content:`<h4>Virchow's triad</h4><ul><li>Stasis</li><li>Hypercoagulability</li><li>Endothelial injury</li></ul><h4>Wells PE score</h4><p>DVT signs (+3), alt dx less likely (+3), HR>100 (+1.5), immobilization (+1.5), prior PE/DVT (+1.5), hemoptysis (+1), malignancy (+1). ≥5 → high prob → CTPA.</p>`},
+  ],
+};
+
+const builtInQs = [
+  {subject:'pharm',stem:'A 55-year-old man with HFrEF. Which beta-blocker has proven mortality benefit?',choices:['Propranolol','Metoprolol succinate','Atenolol','Sotalol'],correct:1,explain:'Metoprolol succinate and carvedilol are the only beta-blockers with proven mortality benefit in HFrEF. Propranolol is non-selective and lacks HF evidence.'},
+  {subject:'path',stem:'Most common cause of community-acquired pneumonia in a healthy adult?',choices:['Klebsiella','Legionella','Streptococcus pneumoniae','Haemophilus influenzae'],correct:2,explain:'S. pneumoniae is the most common CAP pathogen across all age groups.'},
+  {subject:'pharm',stem:'A patient on lisinopril develops a dry cough. Mechanism?',choices:['↑ Angiotensin II','↓ Aldosterone','Bradykinin accumulation','Potassium retention'],correct:2,explain:'ACE inhibitors block bradykinin degradation → accumulation → prostaglandin-mediated airway irritation.'},
+  {subject:'anat',stem:"Erb's palsy results from injury to which nerve roots?",choices:['C5–C6','C7–C8','C8–T1','C5–T1'],correct:0,explain:"Erb's palsy (upper trunk): C5–C6. Classic 'waiter's tip' posture."},
+  {subject:'clin',stem:'Wells PE score of 6. Next best step?',choices:['CT pulmonary angiography','D-dimer','V/Q scan','Lower extremity ultrasound'],correct:0,explain:'Wells ≥5 = high probability. CTPA is the gold standard.'},
+  {subject:'pharm',stem:'Which drug inhibits HMG-CoA reductase?',choices:['Ezetimibe','Gemfibrozil','Rosuvastatin','Cholestyramine'],correct:2,explain:'Statins inhibit HMG-CoA reductase, reducing hepatic cholesterol synthesis.'},
+  {subject:'path',stem:"Virchow's triad does NOT include:",choices:['Hypercoagulability','Endothelial injury','Stasis','Thrombocytopenia'],correct:3,explain:"Virchow's triad: stasis, hypercoagulability, endothelial injury. Thrombocytopenia is not part of it."},
+  {subject:'clin',stem:'Preferred antihypertensive in HTN + CKD?',choices:['Thiazide','CCB','ACE inhibitor','Beta-blocker'],correct:2,explain:'ACE inhibitors (or ARBs) are nephroprotective — reduce intraglomerular pressure via efferent dilation.'},
+  {subject:'anat',stem:'Which structure forms the right heart border on CXR?',choices:['Right ventricle','Right atrium','Superior vena cava','Aortic knob'],correct:1,explain:'The right heart border is formed by the right atrium (and SVC superiorly). The left border from top: aortic knob, pulmonary artery, LA appendage, LV.'},
+  {subject:'anat',stem:'Klumpke palsy results from injury to which nerve roots?',choices:['C5–C6','C6–C7','C7–C8','C8–T1'],correct:3,explain:'Klumpke palsy involves C8–T1 (lower trunk). Results in loss of intrinsic hand muscles and can cause Horner syndrome if T1 sympathetic fibers are involved.'},
+  {subject:'pharm',stem:'Which antihypertensive class is preferred in a pregnant patient?',choices:['ACE inhibitors','ARBs','Labetalol','Lisinopril'],correct:2,explain:'Labetalol (and nifedipine/methyldopa) are safe in pregnancy. ACE inhibitors and ARBs are teratogenic and absolutely contraindicated in pregnancy.'},
+  {subject:'path',stem:'Cold agglutinins are a classic finding in infection with which organism?',choices:['S. pneumoniae','Legionella','Mycoplasma pneumoniae','Klebsiella'],correct:2,explain:'Mycoplasma pneumoniae causes atypical/walking pneumonia and is associated with cold agglutinins (IgM anti-I antibodies). Treat with macrolides or doxycycline.'},
+  {subject:'clin',stem:'A patient presents with tearing back pain and a BP differential between arms. Most likely diagnosis?',choices:['Pulmonary embolism','Aortic dissection','STEMI','Tension pneumothorax'],correct:1,explain:'Aortic dissection classically presents with sudden severe tearing/ripping pain radiating to the back, and a BP differential >20 mmHg between arms due to involvement of subclavian vessels.'},
+  {subject:'anat',stem:'The brachial plexus is formed by which nerve roots?',choices:['C3–C7','C4–T1','C5–T1','C6–T2'],correct:2,explain:'The brachial plexus is formed by ventral rami of C5–T1. Mnemonic for organization: Randy Travis Drinks Cold Beer (Roots, Trunks, Divisions, Cords, Branches).'},
+];
+
+const cases = [
+  {id:1,age:'67F',chief:'Progressive dyspnea on exertion × 3 months',diff:'med',sys:'Cardiology',bp:'158/94',hr:'88',rr:'18',o2:'94%',hpi:'HTN and T2DM. Progressive dyspnea — cannot climb one flight. Bilateral ankle swelling, 2-pillow orthopnea. Exam: JVD, bilateral basal crackles, 2+ pitting edema LE.',dx:'Decompensated HFpEF',abn:'o2'},
+  {id:2,age:'24M',chief:'Pleuritic chest pain and hemoptysis after 8-hour flight',diff:'hard',sys:'Pulmonary',bp:'122/78',hr:'112',rr:'22',o2:'92%',hpi:'Flight attendant. Acute pleuritic right-sided chest pain + hemoptysis after long-haul flight. Tachycardic, hypoxic. Diminished right base breath sounds.',dx:'Pulmonary embolism',abn:'hr,rr,o2'},
+  {id:3,age:'45M',chief:'Fatigue and polyuria × 6 weeks',diff:'easy',sys:'Endocrine',bp:'136/82',hr:'78',rr:'16',o2:'99%',hpi:'6 weeks fatigue, excessive thirst, polyuria. BMI 33, sedentary. Family Hx T2DM. FBG 248 mg/dL, HbA1c 9.4%.',dx:'Type 2 diabetes mellitus',abn:''},
+];
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  (btn || event.currentTarget).classList.add('active');
+  if (name === 'home') renderHome();
+  if (name === 'schedule') renderSchedule();
+  if (name === 'exams') renderExams();
+  if (name === 'notes') renderNoteList();
+  if (name === 'quiz') renderQuizSetup();
+  if (name === 'upload') renderUploadPage();
+  if (name === 'cases') renderCases();
+  if (name === 'settings') renderSettings();
+}
+
+// ── HOME ───────────────────────────────────────────────────────────────────
+function renderHome() {
+  const td = todayStr();
+  const todayTasks = state.tasks.filter(t => (t.date || td) === td);
+  const done = todayTasks.filter(t => t.done).length;
+  const dateEl = document.getElementById('kittyDate');
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('homeStats').innerHTML = `
+    <div class="stat-card"><div class="stat-n" style="color:var(--accent)">${state.streak}</div><div class="stat-l">Day streak 🔥</div></div>
+    <div class="stat-card"><div class="stat-n">${done}/${todayTasks.length}</div><div class="stat-l">Tasks done today</div></div>`;
+  renderExamScroll();
+  renderTaskList();
+}
+
+function renderWeekStrip() {
+  const today = new Date();
+  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const ti = today.getDay();
+  const el = document.getElementById('weekStrip');
+  el.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    el.innerHTML += `<div class="week-day ${i===ti?'today':''}"><div class="week-day-lbl">${days[i]}</div><div class="week-day-num">${today.getDate()-ti+i}</div></div>`;
+  }
+}
+
+function renderExamScroll() {
+  const sorted = [...state.exams].sort((a,b) => new Date(a.date)-new Date(b.date));
+  const el = document.getElementById('examScroll');
+  el.innerHTML = sorted.length ? '' : '<div style="font-size:13px;color:var(--text-muted);padding:10px 0;">No exams added yet</div>';
+  sorted.forEach(e => {
+    const days = daysUntil(e.date);
+    const cls = urgencyClass(days);
+    el.innerHTML += `<div class="exam-chip ${cls}"><div class="exam-name">${e.name}</div><div class="exam-days">${days > 0 ? days+'d' : days === 0 ? 'Today' : 'Past'}</div><div class="exam-date">${fmtDate(e.date)}</div></div>`;
+  });
+}
+
+function renderTaskList() {
+  const el = document.getElementById('taskList');
+  const td = todayStr();
+  const names = {clin:'Clinical',pharm:'Pharm',anat:'Anatomy',path:'Pathology'};
+  const todayTasks = state.tasks.filter(t => (t.date || td) === td);
+  el.innerHTML = todayTasks.length ? '' : '<div class="empty">No tasks for today ✨<br><span style="font-size:12px;">Add one or check Schedule for other days</span></div>';
+  todayTasks.forEach(t => {
+    const i = state.tasks.indexOf(t);
+    el.innerHTML += `<div class="task-row">
+      <div class="chk ${t.done?'done':''}" onclick="toggleTask(${i})">${t.done?'<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:3;stroke-linecap:round;"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+      <span class="task-txt ${t.done?'done':''}">${t.text}</span>
+      <span class="tag tag-${t.tag}">${names[t.tag]}</span>
+      <button onclick="deleteTask(${i})" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:0 0 0 6px;line-height:1;flex-shrink:0;">×</button>
+    </div>`;
+  });
+}
+
+function toggleTask(i) { state.tasks[i].done = !state.tasks[i].done; save(); renderHome(); renderSchedule(); }
+function deleteTask(i) { state.tasks.splice(i,1); save(); renderHome(); renderSchedule(); }
+
+function addTask() {
+  const text = document.getElementById('newTaskText').value.trim();
+  if (!text) return;
+  const date = document.getElementById('newTaskDate').value || todayStr();
+  state.tasks.push({id: Date.now(), text, tag: document.getElementById('newTaskTag').value, done: false, date});
+  document.getElementById('newTaskText').value = '';
+  save(); closeModal('addTaskModal'); renderHome(); renderSchedule();
+}
+
+// ── WEEKLY SCHEDULE ────────────────────────────────────────────────────────
+let schedWeekOffset = 0; // weeks from current
+let schedDayOffset = 0;  // day within the week (0=Sun)
+
+function getWeekDates(weekOffset) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const sun = new Date(today); sun.setDate(today.getDate() - today.getDay() + weekOffset * 7);
+  return Array.from({length:7}, (_,i) => { const d = new Date(sun); d.setDate(sun.getDate()+i); return d; });
+}
+
+function dateToStr(d) { return d.toISOString().split('T')[0]; }
+
+function renderSchedule() {
+  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const fullDays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const weekDates = getWeekDates(schedWeekOffset);
+  const today = todayStr();
+
+  // Week range label
+  const first = weekDates[0], last = weekDates[6];
+  document.getElementById('weekRangeLabel').textContent =
+    first.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' +
+    last.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  // Day tabs
+  const tabsEl = document.getElementById('schedDayTabs');
+  tabsEl.innerHTML = weekDates.map((d,i) => {
+    const ds = dateToStr(d);
+    const count = state.tasks.filter(t => (t.date||today) === ds).length;
+    const isToday = ds === today;
+    const isActive = i === schedDayOffset;
+    return `<div class="note-tab ${isActive?'active':''}" onclick="setSchedDay(${i})" style="${isToday&&!isActive?'border-color:var(--accent);':''};position:relative;">
+      ${days[i]} ${d.getDate()}
+      ${count > 0 ? `<span style="position:absolute;top:2px;right:4px;width:6px;height:6px;background:${isActive?'white':'var(--accent)'};border-radius:50%;display:block;"></span>` : ''}
+    </div>`;
+  }).join('');
+
+  // Selected day
+  const selDate = weekDates[schedDayOffset];
+  const selStr = dateToStr(selDate);
+  const isToday = selStr === today;
+  document.getElementById('schedDayLabel').textContent =
+    fullDays[schedDayOffset] + ', ' + selDate.toLocaleDateString('en-US',{month:'long',day:'numeric'}) + (isToday?' ⭐':'');
+
+  // Tasks for selected day
+  const names = {clin:'Clinical',pharm:'Pharm',anat:'Anatomy',path:'Pathology'};
+  const dayTasks = state.tasks.filter(t => (t.date||today) === selStr);
+  const el = document.getElementById('schedTaskList');
+  el.innerHTML = dayTasks.length ? '' : `<div class="empty" style="padding:24px 0;">No tasks for this day 🌸</div>`;
+  dayTasks.forEach(t => {
+    const i = state.tasks.indexOf(t);
+    el.innerHTML += `<div class="task-row">
+      <div class="chk ${t.done?'done':''}" onclick="toggleTask(${i})">${t.done?'<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:3;stroke-linecap:round;"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+      <span class="task-txt ${t.done?'done':''}">${t.text}</span>
+      <span class="tag tag-${t.tag}">${names[t.tag]}</span>
+      <button onclick="deleteTask(${i})" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:0 0 0 6px;line-height:1;flex-shrink:0;">×</button>
+    </div>`;
+  });
+
+  // Week overview
+  const ovEl = document.getElementById('weekOverview');
+  ovEl.innerHTML = weekDates.map((d,i) => {
+    const ds = dateToStr(d);
+    const tasks = state.tasks.filter(t => (t.date||today) === ds);
+    const done = tasks.filter(t => t.done).length;
+    const isToday = ds === today;
+    const examOnDay = state.exams.find(e => e.date === ds);
+    return `<div class="card" style="margin-bottom:8px;${isToday?'border-color:var(--accent);':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:${isToday?'var(--accent)':'var(--text-primary)'};">${fullDays[i]} ${d.getDate()}${isToday?' ⭐':''}</div>
+          ${examOnDay ? `<div style="font-size:11px;color:var(--danger);font-weight:700;margin-top:2px;">📝 ${examOnDay.name}</div>` : ''}
+          ${tasks.length ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:2px;font-weight:600;">${done}/${tasks.length} tasks</div>` : `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">No tasks</div>`}
+        </div>
+        ${tasks.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:140px;">${tasks.slice(0,4).map(t=>`<span class="tag tag-${t.tag}" style="${t.done?'opacity:.45;text-decoration:line-through;':''}">${t.text.slice(0,18)}${t.text.length>18?'…':''}</span>`).join('')}${tasks.length>4?`<span style="font-size:11px;color:var(--text-muted);font-weight:700;">+${tasks.length-4} more</span>`:''}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function shiftWeek(dir) {
+  schedWeekOffset += dir;
+  // When going to current week, default to today's day
+  if (schedWeekOffset === 0) schedDayOffset = new Date().getDay();
+  renderSchedule();
+}
+
+function setSchedDay(i) { schedDayOffset = i; renderSchedule(); }
+
+function openAddTaskForSchedDay() {
+  const weekDates = getWeekDates(schedWeekOffset);
+  const selStr = dateToStr(weekDates[schedDayOffset]);
+  document.getElementById('newTaskDate').value = selStr;
+  openModal('addTaskModal');
+}
+
+// ── EXAMS ──────────────────────────────────────────────────────────────────
+function daysUntil(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.ceil((d - today) / 86400000);
+}
+function urgencyClass(days) { return days <= 7 ? 'urgent' : days <= 21 ? 'soon' : 'ok'; }
+function fmtDate(dateStr) { return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+
+function renderExams() {
+  const sorted = [...state.exams].sort((a,b) => new Date(a.date)-new Date(b.date));
+  const grid = document.getElementById('examCardGrid');
+  grid.innerHTML = sorted.length ? '' : '<div class="empty">No exams added yet 🌸</div>';
+  sorted.forEach(e => {
+    const days = daysUntil(e.date);
+    const cls = urgencyClass(days);
+    grid.innerHTML += `<div class="card" style="border-color:var(--${cls==='urgent'?'danger':cls==='soon'?'warning':'success'}-border);background:var(--${cls==='urgent'?'danger':cls==='soon'?'warning':'success'}-bg);margin-bottom:8px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div style="font-size:12px;color:var(--text-secondary);margin-bottom:2px;">${e.subj}</div><div style="font-size:15px;font-weight:700;">${e.name}</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${fmtDate(e.date)}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:26px;font-weight:800;color:var(--${cls==='urgent'?'danger':cls==='soon'?'warning':'success'})">${days>0?days+'d':days===0?'Today':'Past'}</div>
+          <button onclick="deleteExam('${e.id}')" style="background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger);border-radius:50px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer;">Remove</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  const tl = document.getElementById('examTimeline');
+  tl.innerHTML = '';
+  sorted.forEach(e => {
+    const days = daysUntil(e.date);
+    const cls = urgencyClass(days);
+    tl.innerHTML += `<div class="tl-item">
+      <div class="tl-dot ${cls}"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div><div class="tl-date">${fmtDate(e.date)} · ${days>0?days+' days':days===0?'Today':'Past'}</div><div class="tl-name">${e.name}</div><div class="tl-sub">${e.subj}</div></div>
+        <button onclick="deleteExam('${e.id}')" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">×</button>
+      </div>
+    </div>`;
+  });
+}
+
+function addExam() {
+  const name = document.getElementById('newExamName').value.trim();
+  const date = document.getElementById('newExamDate').value;
+  if (!name || !date) return;
+  state.exams.push({id: Date.now().toString(), name, subj: document.getElementById('newExamSubj').value, date});
+  document.getElementById('newExamName').value = '';
+  document.getElementById('newExamDate').value = '';
+  save(); closeModal('addExamModal'); renderExams(); renderExamScroll();
+}
+
+function deleteExam(id) {
+  state.exams = state.exams.filter(e => String(e.id) !== String(id));
+  save(); renderExams(); renderExamScroll();
+}
+
+// ── NOTES ──────────────────────────────────────────────────────────────────
+let activeSubject = 'pharm';
+
+// Load custom categories from storage, merged with defaults
+const defaultSubjectLabels = {pharm:'Pharmacology',clin:'Clinical',anat:'Anatomy',path:'Pathology'};
+function getSubjectLabels() {
+  const custom = S.get('pa_custom_categories') || {};
+  return {...defaultSubjectLabels, ...custom};
+}
+// subjectLabels is a live getter so it always reflects saved categories
+let subjectLabels = getSubjectLabels();
+
+function addCategory() {
+  const name = document.getElementById('newCategoryName').value.trim();
+  if (!name) return;
+  const emoji = document.getElementById('newCategoryEmoji').value.trim();
+  // Create a key from the name
+  const key = name.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20) + '_' + Date.now();
+  const label = (emoji ? emoji + ' ' : '') + name;
+  const custom = S.get('pa_custom_categories') || {};
+  custom[key] = label;
+  S.set('pa_custom_categories', custom);
+  subjectLabels = getSubjectLabels();
+  activeSubject = key;
+  document.getElementById('newCategoryName').value = '';
+  document.getElementById('newCategoryEmoji').value = '';
+  closeModal('addCategoryModal');
+  renderNoteList();
+}
+
+function hideCategoryTab(key) {
+  if (!confirm(`Hide the "${subjectLabels[key]}" tab? Your notes stay saved — restore it anytime in Settings.`)) return;
+  const hidden = S.get('pa_hidden_categories') || [];
+  if (!hidden.includes(key)) hidden.push(key);
+  S.set('pa_hidden_categories', hidden);
+  if (activeSubject === key) activeSubject = 'pharm';
+  renderNoteList();
+}
+
+function deleteCategory(key) {
+  if (!confirm(`Delete category "${subjectLabels[key]}" and all its notes? This cannot be undone.`)) return;
+  const custom = S.get('pa_custom_categories') || {};
+  delete custom[key];
+  S.set('pa_custom_categories', custom);
+  delete state.notes[key];
+  subjectLabels = getSubjectLabels();
+  if (activeSubject === key) activeSubject = 'pharm';
+  save();
+  renderNoteList();
+}
+
+function addManualNote() {
+  const title = document.getElementById('newNoteTitle').value.trim();
+  const content = document.getElementById('newNoteContent').value.trim();
+  const category = document.getElementById('newNoteCategory').value;
+  if (!title || !content) { alert('Please fill in both a title and content.'); return; }
+  if (!state.notes[category]) state.notes[category] = [];
+  state.notes[category].unshift({
+    id: 'manual_' + Date.now(),
+    title,
+    content: content.replace(/\n/g, '<br>'),
+    aiGen: false
+  });
+  activeSubject = category;
+  document.getElementById('newNoteTitle').value = '';
+  document.getElementById('newNoteContent').value = '';
+  save();
+  closeModal('addNoteModal');
+  renderNoteList();
+}
+
+function openAddNoteModal() {
+  // Populate category dropdown with all current subjects
+  const sel = document.getElementById('newNoteCategory');
+  sel.innerHTML = Object.entries(subjectLabels)
+    .filter(([k]) => k !== 'review')
+    .map(([k,v]) => `<option value="${k}" ${k===activeSubject?'selected':''}>${v}</option>`)
+    .join('');
+  openModal('addNoteModal');
+}
+
+function openAddCategoryModal() {
+  // Populate emoji picker
+  const emojis = ['📚','🔬','🧬','💊','🩺','🫀','🫁','🦷','👁️','🧠','🦴','💉','🩻','📋','🧪','⚕️'];
+  const picker = document.getElementById('categoryEmojiPicker');
+  if (picker) picker.innerHTML = emojis.map(e =>
+    `<button onclick="document.getElementById('newCategoryEmoji').value='${e}';this.style.background='var(--accent-bg)'" style="background:var(--surface-1);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:18px;cursor:pointer;">${e}</button>`
+  ).join('');
+  openModal('addCategoryModal');
+}
+
+function getHiddenNotes() {
+  try { return JSON.parse(localStorage.getItem('pa_hidden_notes') || '[]'); } catch { return []; }
+}
+function hideBuiltInNote(id) {
+  const hidden = getHiddenNotes();
+  if (!hidden.includes(id)) hidden.push(id);
+  localStorage.setItem('pa_hidden_notes', JSON.stringify(hidden));
+  renderNoteList();
+}
+
+function getAllNotes(subj) {
+  const hidden = getHiddenNotes();
+  const built = (builtInNotes[subj] || []).filter(n => !hidden.includes(n.id));
+  const custom = (state.notes[subj] || []);
+  return [...custom, ...built];
+}
+
+function renderNoteList() {
+  document.getElementById('notesListView').style.display = 'block';
+  document.getElementById('noteDetailView').style.display = 'none';
+  subjectLabels = getSubjectLabels();
+  if ((state.notes['review'] || []).length) subjectLabels['review'] = '⭐ Review';
+  const tabs = document.getElementById('noteTabs');
+  const customKeys = Object.keys(S.get('pa_custom_categories') || {});
+  const defaultKeys = Object.keys(defaultSubjectLabels);
+  const hiddenCats = S.get('pa_hidden_categories') || [];
+  tabs.innerHTML = Object.entries(subjectLabels)
+    .filter(([k]) => !hiddenCats.includes(k))
+    .map(([k,v]) => {
+      const isCustom = customKeys.includes(k);
+      const isActive = k === activeSubject;
+      return `<div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
+        <div class="note-tab ${isActive?'active':''}" onclick="setNoteSubject('${k}')" style="padding-right:26px;">${v}</div>
+        <button onclick="event.stopPropagation();${isCustom?`deleteCategory('${k}')`:`hideCategoryTab('${k}')`}"
+          title="${isCustom?'Delete category':'Hide tab'}"
+          style="position:absolute;right:5px;background:none;border:none;font-size:15px;cursor:pointer;color:${isActive?'rgba(255,255,255,0.7)':'var(--text-muted)'};padding:0;line-height:1;">×</button>
+      </div>`;
+    }).join('');
+  const el = document.getElementById('noteListItems');
+  const notes = getAllNotes(activeSubject);
+  const builtIds = (builtInNotes[activeSubject] || []).map(n => n.id);
+  el.innerHTML = notes.map((n,i) => {
+    const isBuiltIn = builtIds.includes(n.id);
+    return `<div class="note-list-item" onclick="showNoteDetail(${i})">
+      <div class="note-title-sm">${n.title}</div>
+      <button onclick="event.stopPropagation();${isBuiltIn?`hideBuiltInNote('${n.id}')`:`deleteNote('${activeSubject}','${n.id}')`}" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;line-height:1;">×</button>
+      <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--text-muted);fill:none;stroke-width:2;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+  }).join('') || `<div class="empty">No notes yet 🌸<br><span style="font-size:12px;margin-top:4px;display:block;">Use "+ Add note" to write one, or "✦ Generate" for AI help</span></div>`;
+}
+
+function setNoteSubject(s) { activeSubject = s; renderNoteList(); }
+
+function deleteNote(subj, noteId) {
+  if (!state.notes[subj]) return;
+  state.notes[subj] = state.notes[subj].filter(n => n.id !== noteId);
+  save(); renderNoteList();
+}
+
+function showNoteDetail(i) {
+  const n = getAllNotes(activeSubject)[i];
+  const builtIds = (builtInNotes[activeSubject] || []).map(x => x.id);
+  const isBuiltIn = builtIds.includes(n.id);
+  const deleteAction = isBuiltIn
+    ? `hideBuiltInNote('${n.id}');showNoteList();`
+    : `deleteNote('${activeSubject}','${n.id}');showNoteList();`;
+  document.getElementById('notesListView').style.display = 'none';
+  document.getElementById('noteDetailView').style.display = 'block';
+  document.getElementById('noteDetailContent').innerHTML =
+    `<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap;">
+      <h3 style="font-size:17px;font-weight:800;flex:1;">${n.title}</h3>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button onclick="openMoveNoteModal('${n.id}','${activeSubject}')" style="background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Move</button>
+        <button onclick="${deleteAction}" style="background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger);border-radius:50px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">Delete</button>
+      </div>
+    </div>
+    ${n.content}
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+      <div style="font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Quiz yourself on this note</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <label style="font-size:13px;font-weight:600;color:var(--text-secondary);white-space:nowrap;">Questions:</label>
+        <input type="range" min="3" max="10" value="5" id="noteQCount" step="1" oninput="document.getElementById('noteQCountOut').textContent=this.value" style="flex:1;">
+        <span id="noteQCountOut" style="font-size:13px;font-weight:700;min-width:16px;">5</span>
+      </div>
+      <button class="btn btn-accent btn-block" id="noteQuizBtn" onclick="startNoteQuiz('${n.id}', '${activeSubject}', ${i})">
+        ✦ Generate quiz from this note
+      </button>
+      <div id="noteQuizStatus" style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:8px;display:none;"></div>
+    </div>`;
+}
+
+function showNoteList() { renderNoteList(); }
+
+function openMoveNoteModal(noteId, fromSubj) {
+  subjectLabels = getSubjectLabels();
+  const hiddenCats = S.get('pa_hidden_categories') || [];
+  const list = document.getElementById('moveCategoryList');
+  list.innerHTML = Object.entries(subjectLabels)
+    .filter(([k]) => k !== fromSubj && k !== 'review' && !hiddenCats.includes(k))
+    .map(([k,v]) => `
+      <button onclick="moveNote('${noteId}','${fromSubj}','${k}')"
+        class="btn btn-block"
+        style="justify-content:flex-start;gap:10px;padding:12px 14px;">
+        <span style="font-size:15px;">${v.match(/^\p{Emoji}/u)?.[0] || '📁'}</span>
+        <span style="font-size:14px;font-weight:700;">${v}</span>
+      </button>`).join('');
+  openModal('moveNoteModal');
+}
+
+function moveNote(noteId, fromSubj, toSubj) {
+  // Find the note — check custom notes first, then built-in
+  let note = null;
+  const customNotes = state.notes[fromSubj] || [];
+  const customIdx = customNotes.findIndex(n => n.id === noteId);
+
+  if (customIdx !== -1) {
+    // It's a custom/AI note — move it
+    note = customNotes[customIdx];
+    state.notes[fromSubj].splice(customIdx, 1);
+    if (!state.notes[toSubj]) state.notes[toSubj] = [];
+    state.notes[toSubj].unshift({...note});
+    save();
+  } else {
+    // It's a built-in note — hide it from source, copy to destination
+    const builtNote = (builtInNotes[fromSubj] || []).find(n => n.id === noteId);
+    if (builtNote) {
+      hideBuiltInNote(noteId);
+      if (!state.notes[toSubj]) state.notes[toSubj] = [];
+      state.notes[toSubj].unshift({
+        ...builtNote,
+        id: 'moved_' + Date.now(),
+        aiGen: false
+      });
+      save();
+    }
+  }
+  activeSubject = toSubj;
+  closeModal('moveNoteModal');
+  renderNoteList();
+}
+
+async function startNoteQuiz(noteId, subj, noteIdx) {
+  const n = getAllNotes(subj)[noteIdx];
+  if (!n) return;
+  const btn = document.getElementById('noteQuizBtn');
+  const status = document.getElementById('noteQuizStatus');
+  const qCount = parseInt(document.getElementById('noteQCount').value);
+  const apiKey = localStorage.getItem('pa_gemini_key');
+
+  btn.disabled = true;
+  btn.textContent = '✦ Generating questions...';
+  status.style.display = 'block';
+  status.textContent = 'Asking AI to write questions about this note...';
+
+  // Strip HTML tags from note content for the prompt
+  const plainContent = n.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').trim();
+
+  if (!apiKey) {
+    // No API key — fall back to any pre-existing questions tagged to this note, or subject pool
+    status.textContent = 'No Gemini key found — using subject question bank instead.';
+    const pool = builtInQs.filter(q => q.subject === subj);
+    launchNoteQuiz(pool.slice(0, qCount), n.title);
+    btn.disabled = false;
+    btn.textContent = '✦ Generate quiz from this note';
+    return;
+  }
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are a PA school study assistant. Based ONLY on the following note content, generate exactly ${qCount} multiple-choice quiz questions. Return JSON only (no markdown, no backticks):
+[{"stem":string,"choices":[string,string,string,string],"correct":number (0-3 index),"explain":string}]
+
+Note title: ${n.title}
+Note content: ${plainContent}`
+            }]
+          }]
+        })
+      }
+    );
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const questions = parsed.map(q => ({...q, source: n.title, subject: subj}));
+    // Save to generated pool so they appear in subject quizzes too
+    questions.forEach(q => { if (!state.generatedQs.find(x => x.stem === q.stem)) state.generatedQs.push(q); });
+    save();
+    status.style.display = 'none';
+    btn.textContent = '✦ Generate quiz from this note';
+    btn.disabled = false;
+    launchNoteQuiz(questions, n.title);
+  } catch(err) {
+    status.textContent = 'Could not generate questions — check your Gemini key.';
+    btn.disabled = false;
+    btn.textContent = '✦ Generate quiz from this note';
+  }
+}
+
+function launchNoteQuiz(questions, noteTitle) {
+  if (!questions.length) { alert('No questions available for this note yet.'); return; }
+  quizQs = questions;
+  qIdx = 0; qScore = 0; missedQs = [];
+  // Switch to quiz tab and show active quiz with note title header
+  showPage('quiz', document.querySelectorAll('.nav-item')[3]);
+  document.getElementById('quizSetupView').style.display = 'none';
+  document.getElementById('quizActiveView').style.display = 'block';
+  document.getElementById('quizActiveView').innerHTML =
+    `<div style="background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:700;color:var(--accent);">📝 Quizzing on: ${noteTitle}</div>`;
+  renderQuestion();
+}
+
+// ── QUIZ ───────────────────────────────────────────────────────────────────
+let quizQs = [], qIdx = 0, qScore = 0, qAnswered = false, missedQs = [];
+
+function renderQuizSetup() {
+  document.getElementById('quizSetupView').style.display = 'block';
+  document.getElementById('quizActiveView').style.display = 'none';
+  const subjNames = {pharm:'Pharm',clin:'Clinical',anat:'Anatomy',path:'Pathology'};
+  const breakdown = Object.entries(subjNames).map(([k,label]) => {
+    const count = builtInQs.filter(q=>q.subject===k).length + state.generatedQs.filter(q=>q.subject===k).length;
+    return `${label}: ${count}`;
+  }).join(' · ');
+  const total = builtInQs.length + state.generatedQs.length;
+  document.getElementById('qBankStats').innerHTML = `<strong>${total} total questions</strong><br><span style="color:var(--text-muted);font-size:12px;">${breakdown} · Uploaded: ${state.generatedQs.length}</span>`;
+}
+
+function startQuiz() {
+  const n = parseInt(document.getElementById('qCount').value);
+  const src = document.getElementById('quizSource').value;
+  let pool;
+  if (src === 'uploaded') {
+    pool = [...state.generatedQs];
+  } else if (src === 'all') {
+    pool = [...builtInQs, ...state.generatedQs];
+  } else {
+    // src is a subject key: 'pharm', 'clin', 'anat', 'path'
+    pool = [
+      ...builtInQs.filter(q => q.subject === src),
+      ...state.generatedQs.filter(q => (q.subject || '').toLowerCase() === src || (q.source && q.subject === src))
+    ];
+  }
+  quizQs = pool.sort(() => Math.random()-.5).slice(0, Math.min(n, pool.length));
+  qIdx = 0; qScore = 0; missedQs = [];
+  if (!quizQs.length) { alert('No questions available for that subject yet. Try uploading your lecture notes to generate more!'); return; }
+  document.getElementById('quizSetupView').style.display = 'none';
+  document.getElementById('quizActiveView').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const el = document.getElementById('quizActiveView');
+  if (qIdx >= quizQs.length) { showScore(el); return; }
+  const q = quizQs[qIdx]; qAnswered = false;
+  const pct = Math.round((qIdx / quizQs.length) * 100);
+  el.innerHTML = `
+    <div class="q-prog"><div class="q-prog-fill" style="width:${pct}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:14px;"><span>${qIdx+1} of ${quizQs.length}</span><span style="color:var(--success);font-weight:600;">${qScore} correct</span></div>
+    ${q.source?`<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">📄 ${q.source}</div>`:''}
+    <div class="q-stem">${q.stem}</div>
+    <div id="qChoices">${q.choices.map((c,i)=>`<button class="q-choice" id="ch${i}" onclick="answer(${i})">${String.fromCharCode(65+i)}. ${c}</button>`).join('')}</div>
+    <div id="qExplain" style="display:none;" class="q-explain"></div>
+    <button id="qNext" style="display:none;" class="btn btn-block" onclick="nextQ()" style="margin-top:10px;">Next →</button>`;
+}
+
+function answer(i) {
+  if (qAnswered) return; qAnswered = true;
+  const q = quizQs[qIdx];
+  document.querySelectorAll('.q-choice').forEach((c,idx) => {
+    c.disabled = true;
+    if (idx === q.correct) c.classList.add('correct');
+    else if (idx === i && i !== q.correct) c.classList.add('wrong');
+  });
+  if (i === q.correct) qScore++;
+  else missedQs.push(q);
+  document.getElementById('qExplain').style.display = 'block';
+  document.getElementById('qExplain').textContent = q.explain;
+  document.getElementById('qNext').style.display = 'block';
+}
+
+function nextQ() { qIdx++; renderQuestion(); }
+
+function showScore(el) {
+  const pct = Math.round((qScore / quizQs.length) * 100);
+  const missedHTML = missedQs.length ? `
+    <div style="margin-top:24px;text-align:left;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Missed questions</div>
+      ${missedQs.map((q,i) => `
+        <div style="background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:6px;">${q.stem}</div>
+          <div style="font-size:12px;color:var(--success);margin-bottom:4px;">✓ ${q.choices[q.correct]}</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;border-left:2px solid var(--danger-border);padding-left:8px;">${q.explain}</div>
+        </div>`).join('')}
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-pro btn-block" onclick="generateStudyGuide()">
+          ✦ Generate AI study guide from missed questions
+        </button>
+        <button class="btn btn-block" onclick="retakeMissed()">
+          ↻ Retake missed questions only (${missedQs.length})
+        </button>
+      </div>
+    </div>` : `<div style="margin-top:16px;background:var(--success-bg);border-radius:var(--radius);padding:12px;font-size:14px;color:var(--success);text-align:center;">🎉 Perfect score — nothing missed!</div>`;
+
+  el.innerHTML = `<div style="text-align:center;padding:24px 0 0;">
+    <div class="score-big">${pct}%</div>
+    <div style="font-size:14px;color:var(--text-secondary);margin-top:6px;">${pct>=80?'Great work!':pct>=60?'Solid — review the misses below':'Keep going — study guide below will help'}</div>
+    <div class="score-row">
+      <div class="score-item"><div class="score-n" style="color:var(--success)">${qScore}</div><div class="score-l">Correct</div></div>
+      <div class="score-item"><div class="score-n" style="color:var(--danger)">${missedQs.length}</div><div class="score-l">Missed</div></div>
+    </div>
+    <button class="btn btn-accent btn-block" onclick="renderQuizSetup()">New quiz</button>
+  </div>
+  ${missedHTML}`;
+}
+
+async function generateStudyGuide() {
+  if (!missedQs.length) return;
+  const apiKey = localStorage.getItem('pa_gemini_key');
+
+  const missedSummary = missedQs.map((q,i) =>
+    `Q${i+1}: ${q.stem}\nCorrect answer: ${q.choices[q.correct]}\nExplanation: ${q.explain}`
+  ).join('\n\n');
+
+  const btn = event.currentTarget;
+  btn.textContent = '✦ Generating study guide...';
+  btn.disabled = true;
+
+  if (!apiKey) {
+    saveStudyGuideToNotes(buildBasicStudyGuide());
+    btn.textContent = '✓ Study guide saved to Notes';
+    return;
+  }
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are a PA school study assistant. A student missed the following quiz questions. Create a focused study guide. Return JSON only (no markdown, no backticks):
+{"title": string, "summary": string (2 sentences on what to focus on), "sections": [{"heading": string, "content": string (HTML using <p>, <ul><li>)}]}
+
+Missed questions:
+${missedSummary}`
+            }]
+          }]
+        })
+      }
+    );
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    saveStudyGuideToNotes(parsed);
+  } catch(err) {
+    saveStudyGuideToNotes(buildBasicStudyGuide());
+  }
+
+  btn.textContent = '✓ Study guide saved to Notes';
+  btn.disabled = true;
+}
+
+function buildBasicStudyGuide() {
+  return {
+    title: `Study guide — ${new Date().toLocaleDateString()}`,
+    summary: `Review these ${missedQs.length} missed concepts before your next quiz.`,
+    sections: missedQs.map(q => ({
+      heading: q.stem.length > 60 ? q.stem.slice(0,57)+'...' : q.stem,
+      content: `<p><strong>Correct answer:</strong> ${q.choices[q.correct]}</p><p>${q.explain}</p>`
+    }))
+  };
+}
+
+function saveStudyGuideToNotes(guide) {
+  const content = `<p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">${guide.summary}</p>` +
+    guide.sections.map(s => `<h4>${s.heading}</h4>${s.content}`).join('');
+  if (!state.notes['review']) state.notes['review'] = [];
+  state.notes['review'].unshift({
+    id: 'sg_' + Date.now(),
+    title: guide.title,
+    content,
+    aiGen: true
+  });
+  // Also add Review tab to subjects if not present
+  if (!subjectLabels['review']) subjectLabels['review'] = 'Review';
+  save();
+  alert('Study guide saved! Find it in Notes → Review tab.');
+}
+
+function retakeMissed() {
+  quizQs = [...missedQs];
+  qIdx = 0; qScore = 0; missedQs = [];
+  renderQuestion();
+}
+
+// ── UPLOAD ─────────────────────────────────────────────────────────────────
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (key.length < 10) { alert('That doesn\'t look right — paste the full key from Google AI Studio.'); return; }
+  localStorage.setItem('pa_gemini_key', key);
+  document.getElementById('apiSetup').style.display = 'none';
+  alert('Gemini key saved! You\'re ready to upload files 🎀');
+}
+
+function renderUploadPage() {
+  const key = localStorage.getItem('pa_gemini_key');
+  document.getElementById('apiSetup').style.display = key ? 'none' : 'block';
+  renderFileList();
+}
+
+function handleDrag(e, over) { e.preventDefault(); document.getElementById('dropZone').classList.toggle('drag', over); }
+function handleDrop(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('drag'); handleFiles(e.dataTransfer.files); }
+
+async function handleFiles(files) {
+  for (const f of files) await processFile(f);
+}
+
+async function processFile(file) {
+  const bar = document.getElementById('processingBar');
+  const msg = document.getElementById('processingMsg');
+  bar.style.display = 'flex';
+  msg.textContent = `Reading "${file.name}"...`;
+
+  const apiKey = localStorage.getItem('pa_gemini_key');
+  if (!apiKey) { bar.style.display='none'; alert('Please add your free Gemini API key first.'); return; }
+
+  const fname = file.name.toLowerCase();
+  const isPDF = fname.endsWith('.pdf');
+  const isPPT = fname.endsWith('.pptx') || fname.endsWith('.ppt');
+  const isDoc = fname.endsWith('.docx') || fname.endsWith('.doc');
+
+  const prompt = `You are a PA school study assistant. Analyze this document and return JSON only (no markdown, no backticks, no extra text): {"title":string,"subject":string (one of: Clinical, Pharmacology, Anatomy, Pathology, Physiology, Microbiology, Other),"summary":string,"key_notes":[{"heading":string,"content":string}],"quiz_questions":[{"stem":string,"choices":[string,string,string,string],"correct":number (0-3),"explain":string}]}. Include 4-6 key_notes and 5 quiz_questions.`;
+
+  msg.textContent = `Analyzing "${file.name}" with AI...`;
+
+  try {
+    let requestBody;
+
+    if (isPDF) {
+      // PDFs: send as base64 inline data — supported by Gemini
+      const base64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result.split(',')[1]);
+        r.onerror = () => rej(new Error('Could not read file'));
+        r.readAsDataURL(file);
+      });
+      requestBody = {
+        contents: [{
+          parts: [
+            { inline_data: { mime_type: 'application/pdf', data: base64 } },
+            { text: prompt }
+          ]
+        }]
+      };
+    } else if (isPPT || isDoc) {
+      // PowerPoint/Word: Gemini can't parse binary Office files directly.
+      // We send the filename + ask it to generate relevant PA content based on the name.
+      // For best results, export slides as PDF first.
+      requestBody = {
+        contents: [{
+          parts: [{ text: `${prompt}\n\nNote: The student uploaded a file called "${file.name}". Since this is a PowerPoint/Word file that cannot be directly parsed, generate realistic PA school study content that would be appropriate for a file with this name. Base your response on what the filename suggests the lecture covers.` }]
+        }]
+      };
+    } else {
+      // Plain text / markdown — read directly
+      const text = await file.text();
+      requestBody = {
+        contents: [{
+          parts: [{ text: `${prompt}\n\nDocument content:\n${text.slice(0, 30000)}` }]
+        }]
+      };
+    }
+
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(requestBody) }
+    );
+    const data = await resp.json();
+
+    if (data.error) throw new Error(data.error.message);
+
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    const entry = {id:Date.now(), name:file.name, parsed, date:new Date().toLocaleDateString(), size: Math.round(file.size/1024)+'KB'};
+    state.uploadedFiles.push(entry);
+    parsed.quiz_questions.forEach(q => state.generatedQs.push({...q, source:file.name}));
+
+    const subj = subjectToKey(parsed.subject);
+    if (!state.notes[subj]) state.notes[subj] = [];
+    state.notes[subj].unshift({id:'ai_'+Date.now(), title:parsed.title+' ✦', content: parsed.key_notes.map(n=>`<h4>${n.heading}</h4><p>${n.content}</p>`).join(''), aiGen:true});
+
+    save();
+    bar.style.display = 'none';
+    if (isPPT || isDoc) showUploadWarning(file.name);
+    showUploadResult(entry, parsed);
+    renderFileList();
+  } catch(err) {
+    bar.style.display = 'none';
+    showUploadError(file.name, err.message || 'AI analysis failed. Check your API key and try again.');
+  }
+}
+
+function subjectToKey(s) {
+  const m={Clinical:'clin',Pharmacology:'pharm',Anatomy:'anat',Pathology:'path',Physiology:'clin',Microbiology:'path'};
+  return m[s] || 'clin';
+}
+
+function showUploadWarning(name) {
+  const area = document.getElementById('uploadResults');
+  area.innerHTML = `<div class="card" style="border-color:var(--warning-border);background:var(--warning-bg);color:var(--warning);font-size:13px;margin-bottom:8px;font-weight:600;">
+    ⚠️ <strong>${name}</strong> is a PowerPoint/Word file. For best results, export it as a PDF from PowerPoint (File → Export → PDF) then re-upload — the AI can read PDF content directly.
+  </div>` + area.innerHTML;
+}
+
+function showUploadResult(entry, parsed) {
+  const area = document.getElementById('uploadResults');
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.style.marginBottom = '10px';
+  div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:16px;">✦</span><strong style="font-size:14px;">${parsed.title}</strong><span class="tag tag-${subjectToKey(parsed.subject)}">${parsed.subject}</span></div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${parsed.summary}</p>
+    <div style="font-size:12px;color:var(--success);font-weight:500;">✓ ${parsed.quiz_questions.length} questions added to quiz bank · Notes saved</div>`;
+  area.prepend(div);
+}
+
+function showUploadError(name, msg) {
+  const area = document.getElementById('uploadResults');
+  area.innerHTML = `<div class="card" style="border-color:var(--danger-border);background:var(--danger-bg);color:var(--danger);font-size:13px;margin-bottom:8px;">${name}: ${msg}</div>` + area.innerHTML;
+}
+
+function renderFileList() {
+  const el = document.getElementById('uploadedFileList');
+  if (!state.uploadedFiles.length) { el.innerHTML = '<div class="empty">No files yet</div>'; return; }
+  el.innerHTML = state.uploadedFiles.map((f,i) => `
+    <div class="card-sm" style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">📄</span>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:500;">${f.name}</div><div style="font-size:11px;color:var(--text-muted);">${f.parsed.subject} · ${f.size} · ${f.date}</div></div>
+      <button onclick="deleteFile(${i})" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;">×</button>
+    </div>`).join('');
+}
+
+function deleteFile(i) {
+  if (!confirm('Remove this file and its questions?')) return;
+  const fname = state.uploadedFiles[i].name;
+  state.uploadedFiles.splice(i, 1);
+  state.generatedQs = state.generatedQs.filter(q => q.source !== fname);
+  save(); renderFileList();
+}
+
+// ── CASES ──────────────────────────────────────────────────────────────────
+function renderCases() {
+  document.getElementById('caseListView').style.display = 'block';
+  document.getElementById('caseSimView').style.display = 'none';
+  const el = document.getElementById('caseCards');
+  el.innerHTML = cases.map((c,i) => `
+    <div class="card" style="cursor:pointer;" onclick="openCase(${i})">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="font-size:13px;font-weight:600;">${c.age}</span>
+        <span style="font-size:13px;color:var(--text-secondary);flex:1;">${c.chief}</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <span class="diff diff-${c.diff}">${c.diff}</span>
+        <span style="font-size:11px;background:var(--surface-1);color:var(--text-muted);padding:2px 8px;border-radius:4px;">${c.sys}</span>
+      </div>
+    </div>`).join('');
+}
+
+function openCase(i) {
+  const c = cases[i];
+  document.getElementById('caseListView').style.display = 'none';
+  const sim = document.getElementById('caseSimView');
+  sim.style.display = 'block';
+  const abn = v => c.abn.includes(v);
+  sim.innerHTML = `
+    <div class="back-row" onclick="renderCases()">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;"><polyline points="15 18 9 12 15 6"/></svg>
+      Cases
+    </div>
+    <div class="card" style="margin-bottom:10px;">
+      <div style="font-size:16px;font-weight:600;margin-bottom:2px;">${c.age}</div>
+      <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">${c.chief}</div>
+      <div style="font-size:13px;line-height:1.7;color:var(--text-primary);margin-bottom:12px;">${c.hpi}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Vitals</div>
+      <div class="vital-grid">
+        <div class="vital"><div class="vital-val ${abn('bp')?'abn':''}">${c.bp}</div><div class="vital-lbl">BP (mmHg)</div></div>
+        <div class="vital"><div class="vital-val ${abn('hr')?'abn':''}">${c.hr}</div><div class="vital-lbl">HR (bpm)</div></div>
+        <div class="vital"><div class="vital-val ${abn('rr')?'abn':''}">${c.rr}</div><div class="vital-lbl">RR (/min)</div></div>
+        <div class="vital"><div class="vital-val ${abn('o2')?'abn':''}">${c.o2}</div><div class="vital-lbl">SpO2</div></div>
+      </div>
+    </div>
+    <div class="action-grid">
+      <button class="action-btn" onclick="casePrompt('What labs would you order for this patient and why?','${c.hpi}')">🧪 Order labs</button>
+      <button class="action-btn" onclick="casePrompt('What imaging is indicated and why?','${c.hpi}')">📷 Imaging</button>
+      <button class="action-btn" onclick="casePrompt('What is your diagnosis and reasoning?','${c.hpi}')">💡 Diagnose</button>
+      <button class="action-btn" onclick="casePrompt('What is your treatment plan?','${c.hpi}')">💊 Treat</button>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <input type="text" id="caseAsk" placeholder="Ask about this patient..." style="flex:1;" onkeydown="if(event.key==='Enter'){casePrompt(document.getElementById('caseAsk').value,'${c.hpi}')}" />
+      <button class="btn btn-accent" onclick="casePrompt(document.getElementById('caseAsk').value,'${c.hpi}')">Ask</button>
+    </div>`;
+}
+
+function casePrompt(q, hpi) { sendToAI(`PA school patient case: ${hpi}\n\nStudent question: ${q}`); }
+
+// ── MODALS ─────────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModalBackdrop(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+// ── AI HELPER ──────────────────────────────────────────────────────────────
+function sendToAI(prompt) {
+  // Opens a new Claude conversation with this prompt pre-filled
+  const encoded = encodeURIComponent(prompt);
+  window.open(`https://claude.ai/new?q=${encoded}`, '_blank');
+}
+
+// ── THEME ENGINE ───────────────────────────────────────────────────────────
+const themes = [
+  {
+    id: 'sanrio', name: 'Hello Kitty 🎀', emoji: '🎀',
+    accent: '#e8557a', accentBg: '#fff0f4', accentBorder: '#f9c0ce',
+    pro: '#c084d4', proBg: '#fdf4ff', proBorder: '#e8c5f2',
+    surface0: '#fff5f8', surface1: '#ffeef3', surface2: '#ffffff',
+    border: '#fad4e0', borderStrong: '#f0a8be',
+    textPrimary: '#4a2030', textSecondary: '#8a5568', textMuted: '#c0899a',
+    grad1: '#ffccd9', grad2: '#f7d4f0', navShadow: 'rgba(232,85,122,0.1)',
+    titleEmoji: '🎀',
+  },
+  {
+    id: 'lavender', name: 'Lavender Dream 💜', emoji: '💜',
+    accent: '#7c5cbf', accentBg: '#f3eeff', accentBorder: '#d4bbf5',
+    pro: '#9b6dd4', proBg: '#f5eeff', proBorder: '#d8b8f0',
+    surface0: '#f8f5ff', surface1: '#f0eaff', surface2: '#ffffff',
+    border: '#e0d0f5', borderStrong: '#c4a8e8',
+    textPrimary: '#2d1a4a', textSecondary: '#6b4f8a', textMuted: '#b094cc',
+    grad1: '#e8d5ff', grad2: '#d4c0f0', navShadow: 'rgba(124,92,191,0.1)',
+    titleEmoji: '✨',
+  },
+  {
+    id: 'mint', name: 'Minty Fresh 🍃', emoji: '🍃',
+    accent: '#2da87a', accentBg: '#edfaf5', accentBorder: '#a8e8ce',
+    pro: '#5ab4a0', proBg: '#edfaf8', proBorder: '#a8e0d8',
+    surface0: '#f2fbf7', surface1: '#e4f7ee', surface2: '#ffffff',
+    border: '#c0ecd8', borderStrong: '#8ed4b0',
+    textPrimary: '#1a3d2e', textSecondary: '#3d7058', textMuted: '#80b898',
+    grad1: '#c0f0d8', grad2: '#d0f0e8', navShadow: 'rgba(45,168,122,0.1)',
+    titleEmoji: '🌿',
+  },
+  {
+    id: 'peach', name: 'Peachy Keen 🍑', emoji: '🍑',
+    accent: '#e07040', accentBg: '#fff5f0', accentBorder: '#f5c4a8',
+    pro: '#d4845a', proBg: '#fff2ec', proBorder: '#f0c0a0',
+    surface0: '#fff8f5', surface1: '#fff0e8', surface2: '#ffffff',
+    border: '#f5d5c0', borderStrong: '#e8b898',
+    textPrimary: '#3d1f10', textSecondary: '#7a4030', textMuted: '#c09080',
+    grad1: '#ffd5b8', grad2: '#ffe8d0', navShadow: 'rgba(224,112,64,0.1)',
+    titleEmoji: '🍑',
+  },
+  {
+    id: 'sky', name: 'Sky Blue ☁️', emoji: '☁️',
+    accent: '#3a8fd4', accentBg: '#eef6ff', accentBorder: '#aad4f5',
+    pro: '#6aaad8', proBg: '#eef6ff', proBorder: '#b0d4f0',
+    surface0: '#f5f9ff', surface1: '#eaf3ff', surface2: '#ffffff',
+    border: '#c8e4f8', borderStrong: '#98c8f0',
+    textPrimary: '#1a2d40', textSecondary: '#3a5870', textMuted: '#88aac0',
+    grad1: '#c0e0f8', grad2: '#d8eeff', navShadow: 'rgba(58,143,212,0.1)',
+    titleEmoji: '☁️',
+  },
+  {
+    id: 'dark', name: 'Midnight 🌙', emoji: '🌙',
+    accent: '#b088f0', accentBg: '#2a1f3d', accentBorder: '#5a3d8a',
+    pro: '#9070d8', proBg: '#241a38', proBorder: '#503080',
+    surface0: '#0f0d14', surface1: '#181520', surface2: '#211d2c',
+    border: '#332a44', borderStrong: '#4a3d60',
+    textPrimary: '#f0eaff', textSecondary: '#b09acc', textMuted: '#705890',
+    grad1: '#1a1230', grad2: '#201530', navShadow: 'rgba(176,136,240,0.15)',
+    titleEmoji: '🌙',
+  },
+];
+
+let activeThemeId = localStorage.getItem('pa_theme') || 'sanrio';
+let titleEmoji = localStorage.getItem('pa_title_emoji') || '🎀';
+
+function applyTheme(t) {
+  const r = document.documentElement.style;
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--accent-bg', t.accentBg);
+  r.setProperty('--accent-border', t.accentBorder);
+  r.setProperty('--pro', t.pro);
+  r.setProperty('--pro-bg', t.proBg);
+  r.setProperty('--pro-border', t.proBorder);
+  r.setProperty('--surface-0', t.surface0);
+  r.setProperty('--surface-1', t.surface1);
+  r.setProperty('--surface-2', t.surface2);
+  r.setProperty('--border', t.border);
+  r.setProperty('--border-strong', t.borderStrong);
+  r.setProperty('--text-primary', t.textPrimary);
+  r.setProperty('--text-secondary', t.textSecondary);
+  r.setProperty('--text-muted', t.textMuted);
+  // Update body gradient
+  document.body.style.backgroundImage =
+    `radial-gradient(circle at 15% 10%, ${t.grad1} 0%, transparent 35%), radial-gradient(circle at 85% 90%, ${t.grad2} 0%, transparent 35%)`;
+  document.body.style.background = t.surface0;
+  document.body.style.backgroundImage =
+    `radial-gradient(circle at 15% 10%, ${t.grad1} 0%, transparent 35%), radial-gradient(circle at 85% 90%, ${t.grad2} 0%, transparent 35%)`;
+  // Update nav shadow color
+  document.querySelector('.bottom-nav').style.boxShadow = `0 -4px 20px ${t.navShadow}`;
+  // Update meta theme color
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', t.accent);
+  activeThemeId = t.id;
+  localStorage.setItem('pa_theme', t.id);
+}
+
+function applyCustomTheme() {
+  const accent = document.getElementById('customAccent').value;
+  const bg = document.getElementById('customBg').value;
+  // Derive lighter versions of accent for backgrounds/borders
+  const customTheme = {
+    id: 'custom', name: 'Custom', emoji: '🎨',
+    accent, accentBg: bg + 'cc', accentBorder: accent + '55',
+    pro: accent, proBg: bg, proBorder: accent + '44',
+    surface0: bg, surface1: bg + 'dd', surface2: '#ffffff',
+    border: accent + '33', borderStrong: accent + '66',
+    textPrimary: '#1a1a2e', textSecondary: '#555577', textMuted: '#9999bb',
+    grad1: accent + '44', grad2: bg, navShadow: accent + '22',
+    titleEmoji,
+  };
+  applyTheme(customTheme);
+  localStorage.setItem('pa_custom_theme', JSON.stringify(customTheme));
+  activeThemeId = 'custom';
+  renderSettings();
+}
+
+function setRadius(type) {
+  const vals = {cute:'16px', med:'10px', sharp:'4px'};
+  document.documentElement.style.setProperty('--radius', vals[type]);
+  localStorage.setItem('pa_radius', type);
+  document.querySelectorAll('[id^="radius"]').forEach(b => b.classList.remove('btn-accent'));
+  document.getElementById('radius'+type.charAt(0).toUpperCase()+type.slice(1)).classList.add('btn-accent');
+}
+
+function setTitleEmoji(emoji) {
+  titleEmoji = emoji;
+  localStorage.setItem('pa_title_emoji', emoji);
+  // Update the CSS pseudo-element via a style tag
+  let s = document.getElementById('titleEmojiStyle');
+  if (!s) { s = document.createElement('style'); s.id = 'titleEmojiStyle'; document.head.appendChild(s); }
+  s.textContent = `.page-title::after { content: ' ${emoji}'; }`;
+  renderSettings();
+}
+
+function saveApiKeyFromSettings() {
+  const key = document.getElementById('settingsApiKey').value.trim();
+  if (key.length < 10) { alert('Paste the full key from Google AI Studio.'); return; }
+  localStorage.setItem('pa_gemini_key', key);
+  document.getElementById('settingsApiKey').value = '';
+  renderSettings();
+  alert('Key saved! 🎀');
+}
+
+function renderSettings() {
+  // Theme grid
+  const grid = document.getElementById('themeGrid');
+  if (!grid) return;
+  grid.innerHTML = themes.map(t => `
+    <div onclick="applyTheme(themes.find(x=>x.id==='${t.id}'));renderSettings();"
+      style="background:${t.surface2};border:2px solid ${activeThemeId===t.id?t.accent:t.border};border-radius:16px;padding:14px;cursor:pointer;transition:transform .15s;"
+      onmousedown="this.style.transform='scale(0.97)'" onmouseup="this.style.transform='scale(1)'">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="font-size:22px;">${t.emoji}</span>
+        <span style="font-size:13px;font-weight:800;color:${t.textPrimary};">${t.name}</span>
+        ${activeThemeId===t.id?`<span style="margin-left:auto;font-size:11px;background:${t.accent};color:white;padding:2px 8px;border-radius:50px;font-weight:700;">Active</span>`:''}
+      </div>
+      <div style="display:flex;gap:5px;">
+        <div style="flex:1;height:22px;background:${t.accent};border-radius:6px;"></div>
+        <div style="flex:1;height:22px;background:${t.accentBg};border:1px solid ${t.border};border-radius:6px;"></div>
+        <div style="flex:1;height:22px;background:${t.surface0};border:1px solid ${t.border};border-radius:6px;"></div>
+        <div style="flex:1;height:22px;background:${t.pro};border-radius:6px;"></div>
+      </div>
+    </div>`).join('');
+
+  // Emoji picker
+  const emojis = ['🎀','✨','🌸','💊','🩺','🧬','🔬','📚','⭐','🌟','💜','🍃','🌙','🎯','💡','🦋'];
+  const ep = document.getElementById('emojiPicker');
+  if (ep) ep.innerHTML = emojis.map(e =>
+    `<button onclick="setTitleEmoji('${e}')" style="background:${e===titleEmoji?'var(--accent-bg)':'var(--surface-1)'};border:1.5px solid ${e===titleEmoji?'var(--accent-border)':'var(--border)'};border-radius:10px;padding:8px 10px;font-size:20px;cursor:pointer;">${e}</button>`
+  ).join('');
+
+  // Radius buttons
+  const saved = localStorage.getItem('pa_radius') || 'cute';
+  ['cute','med','sharp'].forEach(r => {
+    const btn = document.getElementById('radius'+r.charAt(0).toUpperCase()+r.slice(1));
+    if (btn) btn.style.borderColor = saved===r ? 'var(--accent)' : '';
+  });
+
+  // Sync color pickers to current theme
+  const t = themes.find(x => x.id === activeThemeId);
+  if (t) {
+    document.getElementById('customAccent').value = t.accent;
+    document.getElementById('customBg').value = t.surface0;
+  }
+
+  // API key status
+  const keyEl = document.getElementById('currentKeyStatus');
+  if (keyEl) {
+    const hasKey = !!localStorage.getItem('pa_gemini_key');
+    keyEl.textContent = hasKey ? '✓ Gemini key is saved' : 'No key saved yet';
+    keyEl.style.color = hasKey ? 'var(--success)' : 'var(--text-muted)';
+  }
+}
+
+function loadSavedTheme() {
+  const savedId = localStorage.getItem('pa_theme');
+  const customRaw = localStorage.getItem('pa_custom_theme');
+  if (savedId === 'custom' && customRaw) {
+    try { applyTheme(JSON.parse(customRaw)); } catch {}
+  } else if (savedId) {
+    const t = themes.find(x => x.id === savedId);
+    if (t) applyTheme(t);
+  }
+  const savedRadius = localStorage.getItem('pa_radius');
+  if (savedRadius) {
+    const vals = {cute:'16px', med:'10px', sharp:'4px'};
+    document.documentElement.style.setProperty('--radius', vals[savedRadius]);
+  }
+  const savedEmoji = localStorage.getItem('pa_title_emoji');
+  if (savedEmoji) setTitleEmoji(savedEmoji);
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+document.getElementById('newExamDate').min = new Date().toISOString().split('T')[0];
+document.getElementById('newTaskDate').value = todayStr();
+schedDayOffset = new Date().getDay();
+loadSavedTheme();
+renderHome();
+</script>
+</body>
+</html>
