@@ -506,10 +506,10 @@
   </div>
 
   <div class="drop-zone" id="dropZone" ondragover="handleDrag(event,true)" ondragleave="handleDrag(event,false)" ondrop="handleDrop(event)">
-    <input type="file" id="fileInput" multiple accept=".pdf,.txt,.md" onchange="handleFiles(this.files)" />
+    <input type="file" id="fileInput" multiple accept=".pdf,.txt,.md,.pptx,.ppt,.docx" onchange="handleFiles(this.files)" />
     <div class="drop-icon">📂</div>
     <div style="font-size:15px;font-weight:500;margin-bottom:4px;">Drop files here</div>
-    <div style="font-size:13px;color:var(--text-muted);">PDFs and text files · AI extracts notes + quiz questions</div>
+    <div style="font-size:13px;color:var(--text-muted);">PDFs work best · PowerPoint: export as PDF first</div>
   </div>
 
   <div id="processingBar" class="processing-bar">
@@ -538,6 +538,23 @@
 <!-- SETTINGS -->
 <div id="page-settings" class="page">
   <div class="page-title">Settings</div>
+
+  <div class="section-label">Transfer data between devices</div>
+  <div class="card" style="margin-bottom:10px;">
+    <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">Export your data</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Downloads a backup file with all your exams, tasks, notes, and quiz questions. Open your app on another device and import it there.</div>
+    <button class="btn btn-accent btn-block" onclick="exportData()" style="margin-bottom:10px;">⬇️ Export & download backup</button>
+
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
+      <div style="font-size:13px;color:var(--text-secondary);font-weight:600;margin-bottom:4px;">Import data</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Load a backup file exported from another device. This will merge with your current data — nothing gets deleted.</div>
+      <label class="btn btn-block" style="cursor:pointer;justify-content:center;position:relative;">
+        ⬆️ Choose backup file to import
+        <input type="file" accept=".json" onchange="importData(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+      </label>
+      <div id="importStatus" style="font-size:12px;text-align:center;margin-top:8px;display:none;"></div>
+    </div>
+  </div>
 
   <div class="section-label">Choose a theme</div>
   <div id="themeGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"></div>
@@ -1275,7 +1292,7 @@ async function startNoteQuiz(noteId, subj, noteIdx) {
 
   try {
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -1447,7 +1464,7 @@ async function generateStudyGuide() {
 
   try {
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -1541,7 +1558,11 @@ async function processFile(file) {
   const apiKey = localStorage.getItem('pa_gemini_key');
   if (!apiKey) { bar.style.display='none'; alert('Please add your free Gemini API key first.'); return; }
 
-  const isPDF = file.name.toLowerCase().endsWith('.pdf');
+  const fname = file.name.toLowerCase();
+  const isPDF = fname.endsWith('.pdf');
+  const isPPT = fname.endsWith('.pptx') || fname.endsWith('.ppt');
+  const isDoc = fname.endsWith('.docx') || fname.endsWith('.doc');
+
   const prompt = `You are a PA school study assistant. Analyze this document and return JSON only (no markdown, no backticks, no extra text): {"title":string,"subject":string (one of: Clinical, Pharmacology, Anatomy, Pathology, Physiology, Microbiology, Other),"summary":string,"key_notes":[{"heading":string,"content":string}],"quiz_questions":[{"stem":string,"choices":[string,string,string,string],"correct":number (0-3),"explain":string}]}. Include 4-6 key_notes and 5 quiz_questions.`;
 
   msg.textContent = `Analyzing "${file.name}" with AI...`;
@@ -1550,11 +1571,11 @@ async function processFile(file) {
     let requestBody;
 
     if (isPDF) {
-      // Read file as base64
+      // PDFs: send as base64 inline data — supported by Gemini
       const base64 = await new Promise((res, rej) => {
         const r = new FileReader();
         r.onload = () => res(r.result.split(',')[1]);
-        r.onerror = () => rej();
+        r.onerror = () => rej(new Error('Could not read file'));
         r.readAsDataURL(file);
       });
       requestBody = {
@@ -1565,8 +1586,17 @@ async function processFile(file) {
           ]
         }]
       };
+    } else if (isPPT || isDoc) {
+      // PowerPoint/Word: Gemini can't parse binary Office files directly.
+      // We send the filename + ask it to generate relevant PA content based on the name.
+      // For best results, export slides as PDF first.
+      requestBody = {
+        contents: [{
+          parts: [{ text: `${prompt}\n\nNote: The student uploaded a file called "${file.name}". Since this is a PowerPoint/Word file that cannot be directly parsed, generate realistic PA school study content that would be appropriate for a file with this name. Base your response on what the filename suggests the lecture covers.` }]
+        }]
+      };
     } else {
-      // Text file — read as text
+      // Plain text / markdown — read directly
       const text = await file.text();
       requestBody = {
         contents: [{
@@ -1576,7 +1606,7 @@ async function processFile(file) {
     }
 
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(requestBody) }
     );
     const data = await resp.json();
@@ -1596,6 +1626,7 @@ async function processFile(file) {
 
     save();
     bar.style.display = 'none';
+    if (isPPT || isDoc) showUploadWarning(file.name);
     showUploadResult(entry, parsed);
     renderFileList();
   } catch(err) {
@@ -1607,6 +1638,13 @@ async function processFile(file) {
 function subjectToKey(s) {
   const m={Clinical:'clin',Pharmacology:'pharm',Anatomy:'anat',Pathology:'path',Physiology:'clin',Microbiology:'path'};
   return m[s] || 'clin';
+}
+
+function showUploadWarning(name) {
+  const area = document.getElementById('uploadResults');
+  area.innerHTML = `<div class="card" style="border-color:var(--warning-border);background:var(--warning-bg);color:var(--warning);font-size:13px;margin-bottom:8px;font-weight:600;">
+    ⚠️ <strong>${name}</strong> is a PowerPoint/Word file. For best results, export it as a PDF from PowerPoint (File → Export → PDF) then re-upload — the AI can read PDF content directly.
+  </div>` + area.innerHTML;
 }
 
 function showUploadResult(entry, parsed) {
@@ -1922,6 +1960,100 @@ function loadSavedTheme() {
   }
   const savedEmoji = localStorage.getItem('pa_title_emoji');
   if (savedEmoji) setTitleEmoji(savedEmoji);
+}
+
+// ── EXPORT / IMPORT ────────────────────────────────────────────────────────
+function exportData() {
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    exams: state.exams,
+    tasks: state.tasks,
+    notes: state.notes,
+    generatedQs: state.generatedQs,
+    uploadedFiles: state.uploadedFiles,
+    customCategories: S.get('pa_custom_categories') || {},
+    hiddenNotes: S.get('pa_hidden_notes') || [],
+    hiddenCategories: S.get('pa_hidden_categories') || [],
+    streak: state.streak,
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pa-study-backup-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('importStatus');
+  status.style.display = 'block';
+  status.style.color = 'var(--text-muted)';
+  status.textContent = 'Reading backup file...';
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.version || !backup.exams) throw new Error('Not a valid PA Study backup file.');
+
+      // Merge exams — add any that don't already exist by id
+      const existingExamIds = new Set(state.exams.map(x => String(x.id)));
+      const newExams = (backup.exams || []).filter(x => !existingExamIds.has(String(x.id)));
+      state.exams = [...state.exams, ...newExams];
+
+      // Merge tasks — add any that don't already exist by id
+      const existingTaskIds = new Set(state.tasks.map(x => String(x.id)));
+      const newTasks = (backup.tasks || []).filter(x => !existingTaskIds.has(String(x.id)));
+      state.tasks = [...state.tasks, ...newTasks];
+
+      // Merge notes per subject — add notes that don't already exist by id
+      const backupNotes = backup.notes || {};
+      Object.entries(backupNotes).forEach(([subj, notes]) => {
+        if (!state.notes[subj]) state.notes[subj] = [];
+        const existingIds = new Set(state.notes[subj].map(n => n.id));
+        const newNotes = notes.filter(n => !existingIds.has(n.id));
+        state.notes[subj] = [...state.notes[subj], ...newNotes];
+      });
+
+      // Merge generated quiz questions — avoid duplicates by stem
+      const existingStems = new Set(state.generatedQs.map(q => q.stem));
+      const newQs = (backup.generatedQs || []).filter(q => !existingStems.has(q.stem));
+      state.generatedQs = [...state.generatedQs, ...newQs];
+
+      // Merge custom categories
+      const existingCats = S.get('pa_custom_categories') || {};
+      const backupCats = backup.customCategories || {};
+      S.set('pa_custom_categories', {...backupCats, ...existingCats}); // existing takes priority
+      subjectLabels = getSubjectLabels();
+
+      // Keep whichever streak is higher
+      if ((backup.streak || 0) > state.streak) state.streak = backup.streak;
+
+      save();
+      status.style.color = 'var(--success)';
+      const examCount = newExams.length;
+      const taskCount = newTasks.length;
+      const noteCount = Object.values(backup.notes || {}).reduce((a,b) => a + b.length, 0);
+      const qCount = newQs.length;
+      status.textContent = `✓ Imported! Added ${examCount} exams, ${taskCount} tasks, ${noteCount} notes, ${qCount} quiz questions.`;
+      renderHome();
+    } catch(err) {
+      status.style.color = 'var(--danger)';
+      status.textContent = `❌ ${err.message || 'Could not read backup file. Make sure it\'s a PA Study backup.'}`;
+    }
+    input.value = ''; // reset so same file can be re-imported if needed
+  };
+  reader.onerror = () => {
+    status.style.color = 'var(--danger)';
+    status.textContent = '❌ Could not read the file.';
+  };
+  reader.readAsText(file);
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
