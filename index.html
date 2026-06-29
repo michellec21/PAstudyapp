@@ -1907,6 +1907,8 @@ function fixStuckTabs() {
   renderNoteList();
   alert(`Removed ${badKeys.length} stuck tab${badKeys.length > 1 ? 's' : ''}! 🌸`);
 }
+
+function saveApiKeyFromSettings() {
   const key = document.getElementById('settingsApiKey').value.trim();
   if (key.length < 10) { alert('Paste the full key from Google AI Studio.'); return; }
   localStorage.setItem('pa_gemini_key', key);
