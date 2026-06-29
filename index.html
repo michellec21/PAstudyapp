@@ -604,6 +604,7 @@
     <div style="display:flex;flex-direction:column;gap:8px;">
       <button class="btn btn-block" onclick="S.set('pa_hidden_categories',[]);renderNoteList();alert('Category tabs restored! 🌸')">Restore hidden category tabs</button>
       <button class="btn btn-block" onclick="localStorage.removeItem('pa_hidden_notes');renderNoteList();alert('Built-in notes restored! 🌸')">Restore deleted built-in notes</button>
+      <button class="btn btn-block" onclick="fixStuckTabs()" style="border-color:var(--warning-border);color:var(--warning);">🔧 Remove stuck / broken tabs</button>
     </div>
   </div>
 
@@ -1884,7 +1885,22 @@ function setTitleEmoji(emoji) {
   renderSettings();
 }
 
-function saveApiKeyFromSettings() {
+function fixStuckTabs() {
+  const custom = S.get('pa_custom_categories') || {};
+  const badKeys = Object.keys(custom).filter(k => {
+    const v = custom[k];
+    return !v || typeof v !== 'string' || v.trim() === '' ||
+      v.includes('Add note') || v.includes('onclick') || v.includes('<') ||
+      v.includes('Generate') || v.includes('btn') || v.length > 40;
+  });
+  if (badKeys.length === 0) { alert('No stuck tabs found — everything looks good! 🌸'); return; }
+  badKeys.forEach(k => delete custom[k]);
+  S.set('pa_custom_categories', custom);
+  subjectLabels = getSubjectLabels();
+  if (activeSubject && badKeys.includes(activeSubject)) activeSubject = 'pharm';
+  renderNoteList();
+  alert(`Removed ${badKeys.length} stuck tab${badKeys.length > 1 ? 's' : ''}! 🌸`);
+}
   const key = document.getElementById('settingsApiKey').value.trim();
   if (key.length < 10) { alert('Paste the full key from Google AI Studio.'); return; }
   localStorage.setItem('pa_gemini_key', key);
@@ -2057,6 +2073,19 @@ function importData(input) {
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
+// Clean up any malformed custom categories (e.g. empty names or button text saved as categories)
+(function cleanupCategories() {
+  const custom = S.get('pa_custom_categories') || {};
+  let changed = false;
+  Object.keys(custom).forEach(k => {
+    const v = custom[k];
+    if (!v || typeof v !== 'string' || v.trim() === '' || v.includes('Add note') || v.includes('onclick') || v.includes('<')) {
+      delete custom[k];
+      changed = true;
+    }
+  });
+  if (changed) S.set('pa_custom_categories', custom);
+})();
 document.getElementById('newExamDate').min = new Date().toISOString().split('T')[0];
 document.getElementById('newTaskDate').value = todayStr();
 schedDayOffset = new Date().getDay();
